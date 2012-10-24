@@ -8,7 +8,7 @@ main() ->
 		false -> wf:redirect_to_login("/login")
 	end.
 
-main_authorized() -> #template{file="site/templates/bare.html"}.
+main_authorized() -> #template{file="site/templates/twitter.html"}.
 
 title() -> "Twitter Example with Comet".
 
@@ -17,14 +17,29 @@ body() ->
 	wf:wire(search,term,#validate{validators=[
 		#is_required{text="Required"}
 	]}),
+	wf:wire(#api{name=dropAPI, tag=f1}),
 	#panel{id=wrapper,class="special",body=[
 		#h1{text="Twitter Search using Comet",class="banner"},
+		#droppable {tag=dropPin,body=[
+			#panel{body=[
+				#span{text="Drop a tweet here to pin it! (then Search another term!)"}
+				]}
+			]},
+		%% add a area to flash content to
+		#flash{},
 		#textbox{id=term,text=LastSearchTerm},
 		#button{id=search,postback=search,text="Search"},
 		#span{id=controllers},
+		#panel	{id=pinnedTweets},
 		#span{id=results}
 	]}.
 
+
+drop_event(DragTag, _DropTag) ->
+	%% we wire a bit of javascript to the page to detach the tweet and move it to a new area
+	%% this doesn't use session data (maybe later? :P)
+    wf:wire("objs('pinnedTweets').prepend(objs('"++DragTag++"').detach()).addClass('pinned');"),
+    ok.
 
 event(pause) ->
 	wf:info("Pausing"),
@@ -40,7 +55,6 @@ event(search) ->
 	%% Get postback info
 	SearchTerm = wf:q(term),
 	wf:session(twitterterm,SearchTerm),
-
 
 	%% Kill the running search process 
 	OldPid = wf:state(twitterpid),
@@ -81,17 +95,18 @@ get_twitter_posts(SearchTerm,LastNum) ->
 	end.
 
 format_twitter_post(Proplist) ->	
-	[User,Avatar,Text,Time] = [proplists:get_value(F,Proplist) || F <- [<<"from_user">>,<<"profile_image_url">>,<<"text">>,<<"created_at">>]],
-	#panel{class=twitterpost,actions=#show{effect=slide},body=[
-		Text,
-		#br{},
-		#image{image=Avatar},
-		#span{class=user,text=User},
-		" posted ",
-		#span{class=time,text=Time}
+	[User,Avatar,Text,Time,ID] = [proplists:get_value(F,Proplist) || F <- [<<"from_user">>,<<"profile_image_url">>,<<"text">>,<<"created_at">>,<<"id_str">>]],
+	%% try to make a unique tag using the Time of the tweet (we don't need to see this they just need to be unique)
+	#draggable{id="tweet"++wf:to_list(ID),tag="tweet"++wf:to_list(ID),body=[
+		#panel{class=twitterpost,actions=#show{effect=slide},body=[
+			Text,
+			#br{},
+			#image{image=Avatar},
+			#span{class=user,text=User},
+			" posted ",
+			#span{class=time,text=Time}
+		]}
 	]}.
-
-
 
 decode_twitter(Json) ->
 	{struct,Decoded} = mochijson2:decode(Json),
