@@ -32,7 +32,7 @@ inner_body() ->
 	#textbox {id=userTB, next=passTB},
 	#p{},
 	#label {text="Password"},
-	#textbox {id=passTB, next=okButton},
+	#password {id=passTB, next=okButton},
 	#p{},
 	#button {id=okButton, text="Submit", postback=ok}	
     ].
