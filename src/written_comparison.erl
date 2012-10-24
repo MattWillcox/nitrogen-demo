@@ -79,12 +79,11 @@ event(clicked_Zotonic) ->
         <p>
         Zotonic is a web application framework built with Erlang. Like Nitrogen, Zotonic inherited various advantages of Erlang that would help in creating large scale, multi-process and distributed programs, such as hot code swapping and stability. One of the differences between the two frameworks would be that Zotonic is also a content-management system (CMS), which can be use to create content rich website easily. 
         <p>
-        Zotonic employs a MVC structure, while Nitrogen adopted an Event-driven development process. MVC is the recent trend to build complex web applications, and the controller helps in separating action code from presentation code. The downside would be that developers using Zotonic would find themselves spending time on figuring out the controller and it’s constraints as well as trying to save every form in a database. Nitrogen developers never need to worry about saving data from the previous form since Nitrogen allows you to specify the next view based on the previous view, previous events, or any combination of these as well as gi. 
+        Zotonic employs a MVC structure, while Nitrogen adopted an Event-driven development process. MVC is the recent trend to build complex web applications, and the controller helps in separating action code from presentation code. The downside would be that developers using Zotonic would find themselves spending time on figuring out the controller and it’s constraints as well as trying to save every form in a database. Nitrogen developers never need to worry about saving data from the previous form since Nitrogen allows you to specify the next view based on the previous view, previous events, or any combination of these as well as providing some easy-to-use function to store data in cache. 
         <p>
         Another major differences is that Zotonic ties to a database, namely PostgreSQL, which gives away some flexibility when developing large scale applications. Nitrogen, in the other hand, does not require a database. In fact, a Nitrogen developer would have to go to some third party libraries if he wants to use a database.
         <p>
-        Learning to use Nitrogen might be more challenging than learning Zotonic due to the fact that Nitrogen has very limited documentation while Zotonic had a much larger community and more online resources.  
-        "   
+        Learning to use Nitrogen might be more challenging than learning Zotonic due to the fact that Nitrogen has very limited documentation while Zotonic had a much larger community and more online resources."   
         ]}  
     );
 event(clicked_CodeIgniter) ->
