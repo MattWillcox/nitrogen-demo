@@ -2,7 +2,13 @@
 -compile(export_all).
 -include_lib("nitrogen_core/include/wf.hrl").
 
-main() -> #template{file="site/templates/bare.html"}.
+main() -> 
+	case wf:user() /= undefined of
+		true -> main_authorized();
+		false -> wf:redirect_to_login("/login")
+	end.
+
+main_authorized() -> #template{file="site/templates/bare.html"}.
 
 title() -> "Twitter Example with Comet".
 
