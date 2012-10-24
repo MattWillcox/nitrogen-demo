@@ -17,7 +17,7 @@ inner_body() ->
 	Event = #event {target=theDiv, type=click},
 	wf:wire(okButton, userTB, #validate { validators=[#is_required { text="Required, at least make up some name."} ]}),
 	wf:wire(okButton, passTB, #validate { validators=[#is_required { text="Required, Read the Hint for instructions"},
-		#custom {text ="Please use 'pass' as password.", function=fun check_password/2}]}),
+		#custom {text ="Please read the Hint for instructions", function=fun check_password/2}]}),
     [
 	#h1 {text="Login Page"},
 	#p{},
