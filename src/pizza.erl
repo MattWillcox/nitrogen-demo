@@ -16,11 +16,11 @@ body() ->
         1. Choose the size of your pizza
         ",
         #br{},
-        #dropdown { options=[
-            #option { text="Personal $10.00" },
-            #option { text="Small    $13.00" },
-            #option { text="Medium   $15.00" },
-            #option { text="Large    $18.00" }
+        #dropdown { id=pizzaSize, options=[
+            #option { text="Personal $10.00", value="Personal" },
+            #option { text="Small    $13.00", value="Small" },
+            #option { text="Medium   $15.00", value="Medium" },
+            #option { text="Large    $18.00", value="Large" }
         ]},
         #p{},
         "
@@ -65,7 +65,10 @@ body() ->
             #option { text="BC", value="1" }
         ]},
         #p{},
-        #button { id=button, text="Place an order", postback=click }
+        #button { id=button, text="Place an order", postback=click },
+        #p{},
+        #flash {},
+        #p { style="margin-bottom: 100px;"}
     ],
 
     wf:wire(button, nameTextBox, #validate {validators=[
@@ -92,16 +95,15 @@ body() ->
 
     
 event(click) ->
+    wf:wire(button, #hide{} ),
+    wf:flash( "Thank you for choosing href pizza! This page will be reloaded after 5 seconds" ),
+    Size = wf:q(pizzaSize), 
     Name = wf:q(nameTextBox),
     Type = wf:q(pizzaType),
-    Message = "Thank you for using our online ordering service," ++ Name ++ ". You have ordered " ++ Type,
-    wf:wire(#confirm { text=Message, postback=showConfirmPage });
+    Message = "Thank you for using our online ordering service, " ++ Name ++ ". You have ordered " ++ Size ++ " " ++ Type ++ ".",
+    wf:wire(#confirm { text=Message, postback=refreshPage });
 
-event(showConfirmPage) ->
-    Message = "Thank you for choosing href pizza! This page will be reloaded after 5 seconds",
-    wf:replace(button, #flash {} ),
-    wf:flash( Message ),
-    wf:flush(),
+event(refreshPage) ->
     timer:sleep(5000),
     wf:redirect("/pizza");
 
