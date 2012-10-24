@@ -42,4 +42,4 @@ inner_body() ->
 event(ok) ->
     	User = wf:q(userTB),
 	wf:user(User),
-	wf:redirect("/index").
+	wf:redirect_from_login("/index").

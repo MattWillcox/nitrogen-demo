@@ -21,8 +21,6 @@ body() ->
     ]}.
 
 inner_body()->
-		Event = #event {target=data, type=click},
-
 	wf:wire(button, nameTextBox, #validate {validators=[
         #is_required { text="Required." }
     ]}),
@@ -99,8 +97,10 @@ inner_body()->
         #p{},
         #button { id=button, text="Place an order", postback=click },
         #p{},
+	#link { text="Go Back Home", style="font-size: 200%;", url="/index" },
         #flash {},
         #p { style="margin-bottom: 100px;"}
+	
     ].
 
     

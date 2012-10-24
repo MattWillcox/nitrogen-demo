@@ -19,6 +19,9 @@ body() ->
 	]}),
 	#panel{id=wrapper,class="special",body=[
 		#h1{text="Twitter Search using Comet",class="banner"},
+		#p{},
+		#link { text="Go Back Home", style="font-size: 150%;", url="/index" },
+		#p{},
 		#textbox{id=term,text=LastSearchTerm},
 		#button{id=search,postback=search,text="Search"},
 		#span{id=controllers},
