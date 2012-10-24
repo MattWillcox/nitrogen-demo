@@ -20,6 +20,9 @@ body() ->
 	wf:wire(#api{name=dropAPI, tag=f1}),
 	#panel{id=wrapper,class="special",body=[
 		#h1{text="Twitter Search using Comet",class="banner"},
+		#p{},
+		#link { text="Go Back Home", style="font-size: 150%;", url="/index" },
+		#p{},
 		#droppable {tag=dropPin,body=[
 			#panel{body=[
 				#span{text="Drop a tweet here to pin it! (then Search another term!)"}
