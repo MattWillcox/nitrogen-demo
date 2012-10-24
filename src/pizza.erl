@@ -4,12 +4,44 @@
 -include_lib("nitrogen_core/include/wf.hrl").
 
 
-main() -> #template { file="./site/templates/pizza.html" }.
+main() -> 
+	case wf:user() /= undefined of
+		true -> main_authorized();
+		false -> wf:redirect_to_login("/login")
+	end.
+
+
+main_authorized() -> #template { file="./site/templates/pizza.html" }.
 
 title() -> "href Pizza: Place an order online".
 
 body() -> 
-    Body = [
+	#container_12 { body=[
+        #grid_8 { alpha=true, prefix=2, suffix=2, omega=true, body=inner_body() }
+    ]}.
+
+inner_body()->
+		Event = #event {target=data, type=click},
+
+	wf:wire(button, nameTextBox, #validate {validators=[
+        #is_required { text="Required." }
+    ]}),
+
+    wf:wire(button, emailTextBox, #validate {validators=[
+        #is_required { text="Required." },
+        #is_email { text="Invalie Email Address" }
+    ]}),
+
+    wf:wire(button, streetTextBox, #validate {validators=[
+        #is_required { text="Required." }
+    ]}),
+
+    wf:wire(button, cityTextBox, #validate {validators=[
+        #is_required { text="Required." },
+        #custom { text="We currently can only deliver in Burnaby.", tag=city_tag, function=fun city_val/2}
+    ]}),
+
+[
         #h1 { text="Welcome to href Pizza" },
         #p{},
         "
@@ -69,29 +101,7 @@ body() ->
         #p{},
         #flash {},
         #p { style="margin-bottom: 100px;"}
-    ],
-
-    wf:wire(button, nameTextBox, #validate {validators=[
-        #is_required { text="Required." }
-    ]}),
-
-    wf:wire(button, emailTextBox, #validate {validators=[
-        #is_required { text="Required." },
-        #is_email { text="Invalie Email Address" }
-    ]}),
-
-    wf:wire(button, streetTextBox, #validate {validators=[
-        #is_required { text="Required." }
-    ]}),
-
-    wf:wire(button, cityTextBox, #validate {validators=[
-        #is_required { text="Required." },
-        #custom { text="We currently can only deliver in Burnaby.", tag=city_tag, function=fun city_val/2}
-    ]}),
-
-
-    Body.
-
+    ].
 
     
 event(click) ->

@@ -21,7 +21,16 @@ body() ->
             #tablecell { align=center, body=#link { text="Comparison to CodeIgniter", postback=clicked_CodeIgniter }}
         ]},
 
-        #panel {id=data}
+        #panel {id=data, style="margin: 20px 0px;", body=[
+        "<center><heading2><u>Nitrogen</u><heading2></center>
+        <p>
+        Nitrogen is a lightweight event-driven web framework for Erlang functional programming language. Running on top of Mochiweb, Inets, Yaws, or Misultin web servers, it is highly stable and scalable web framework, that allows fast development of a web page. As it is written in Erlang, it inherits most of the advantages of Erlang, such as hot code swapping, scalability, stability, robustness, fault tolerance, and so on. In addition, it supports built-in JSON for data passing, asynchronous communication between client and server using built-in AJAX and Comet, client-side scripting using jQuery and jQuery UI, and so on. Nitrogen is also very flexible as the framework can be run on any platform that can run Erlang and any of above mentioned web servers.
+        <p>
+        It, however, also has some drawbacks to it. Although powerful, Erlang, or functional programming language itself may be new to many of the developers, and therefore, it is expected to have high learning curve. In addition, as Nitrogen is lightweight and has to sometimes depend on third-party libraries or drivers, developers new to the framework has to spend much time to get themselves familiarized with not only Erlang and Nitrogen, but the third-party libraries as well. Furthermore, Nitrogen is considered to be new technology, compared to other web frameworks. Due to this reason, the community is quite small and documentation is very limited.
+        <p>
+        Although there are some drawbacks, most of them are related to learning the technology, and considering its powerful features, it may be worth the pain, and it will benefit many developers. In the other sections of this page, Nitrogen is compared to others technologies in more detail.
+        <p>"
+        ]}
 
         ]}
     ].
@@ -79,7 +88,7 @@ event(clicked_Zotonic) ->
         <p>
         Zotonic is a web application framework built with Erlang. Like Nitrogen, Zotonic inherited various advantages of Erlang that would help in creating large scale, multi-process and distributed programs, such as hot code swapping and stability. One of the differences between the two frameworks would be that Zotonic is also a content-management system (CMS), which can be use to create content rich website easily. 
         <p>
-        Zotonic employs a MVC structure, while Nitrogen adopted an Event-driven development process. MVC is the recent trend to build complex web applications, and the controller helps in separating action code from presentation code. The downside would be that developers using Zotonic would find themselves spending time on figuring out the controller and it’s constraints as well as trying to save every form in a database. Nitrogen developers never need to worry about saving data from the previous form since Nitrogen allows you to specify the next view based on the previous view, previous events, or any combination of these as well as gi. 
+        Zotonic employs a MVC structure, while Nitrogen adopted an Event-driven development process. MVC is the recent trend to build complex web applications, and the controller helps in separating action code from presentation code. The downside would be that developers using Zotonic would find themselves spending time on figuring out the controller and it’s constraints as well as trying to save every form in a database. Nitrogen developers never need to worry about saving data from the previous form since Nitrogen allows you to specify the next view based on the previous view, previous events, or any combination of these as well as providing some easy-to-use function to store data in cache.  
         <p>
         Another major differences is that Zotonic ties to a database, namely PostgreSQL, which gives away some flexibility when developing large scale applications. Nitrogen, in the other hand, does not require a database. In fact, a Nitrogen developer would have to go to some third party libraries if he wants to use a database.
         <p>
