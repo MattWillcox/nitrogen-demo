@@ -1,0 +1,19 @@
+.banner { text-align: center }
+.special { text-align: center }
+.twitterpost { text-align: left }
+
+.twitterpost .time {
+	color:gray;
+}
+
+.twitterpost .user {
+	font-weight:bold;
+}
+
+.ui-droppable {
+	background-color:yellow;
+}
+
+.pinned {
+	background-color:yellow;
+}
