@@ -21,7 +21,16 @@ body() ->
             #tablecell { align=center, body=#link { text="Comparison to CodeIgniter", postback=clicked_CodeIgniter }}
         ]},
 
-        #panel {id=data}
+        #panel {id=data, style="margin: 20px 0px;", body=[
+        "<center><heading2><u>Nitrogen</u><heading2></center>
+        <p>
+        Nitrogen is a lightweight event-driven web framework for Erlang functional programming language. Running on top of Mochiweb, Inets, Yaws, or Misultin web servers, it is highly stable and scalable web framework, that allows fast development of a web page. As it is written in Erlang, it inherits most of the advantages of Erlang, such as hot code swapping, scalability, stability, robustness, fault tolerance, and so on. In addition, it supports built-in JSON for data passing, asynchronous communication between client and server using built-in AJAX and Comet, client-side scripting using jQuery and jQuery UI, and so on. Nitrogen is also very flexible as the framework can be run on any platform that can run Erlang and any of above mentioned web servers.
+        <p>
+        It, however, also has some drawbacks to it. Although powerful, Erlang, or functional programming language itself may be new to many of the developers, and therefore, it is expected to have high learning curve. In addition, as Nitrogen is lightweight and has to sometimes depend on third-party libraries or drivers, developers new to the framework has to spend much time to get themselves familiarized with not only Erlang and Nitrogen, but the third-party libraries as well. Furthermore, Nitrogen is considered to be new technology, compared to other web frameworks. Due to this reason, the community is quite small and documentation is very limited.
+        <p>
+        Although there are some drawbacks, most of them are related to learning the technology, and considering its powerful features, it may be worth the pain, and it will benefit many developers. In the other sections of this page, Nitrogen is compared to others technologies in more detail.
+        <p>"
+        ]}
 
         ]}
     ].

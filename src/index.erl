@@ -25,9 +25,11 @@ inner_body() ->
 	#p{},
 	#link {show_if = (wf:user() /= undefined), text = "Click to Logout", postback = logout},
 	#p{},
-	#link {text = "Click here to access our top secrets", url = "/twitter"},
+	#link {text = "Click here to access our top secrets (Twitter Page)", url = "/twitter"},
 	#p{},
-	#link {text = "Click here to access Comparisons", url = "/written_comparison"}
+	#link {text = "Click here to access our top secrets (Features Page)", url = "/pizza"},
+	#p{},
+	#link {text = "Click here to access Comparisons (No restrictions)", url = "/written_comparison"}
         
     ].
 	

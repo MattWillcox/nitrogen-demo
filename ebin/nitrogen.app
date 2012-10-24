@@ -6,4 +6,4 @@
               {mod,{nitrogen_app,[]}},
               {env,[]},
               {modules,[index,login,nitrogen_app,nitrogen_mochiweb,
-                        nitrogen_sup,twitter,written_comparison]}]}.
+                        nitrogen_sup,pizza,twitter,written_comparison]}]}.
