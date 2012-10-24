@@ -5,5 +5,5 @@
               {applications,[kernel,stdlib]},
               {mod,{nitrogen_app,[]}},
               {env,[]},
-              {modules,[index,nitrogen_app,nitrogen_mochiweb,nitrogen_sup,
-                        twitter]}]}.
+              {modules,[index,login,nitrogen_app,nitrogen_mochiweb,
+                        nitrogen_sup,twitter,written_comparison]}]}.
