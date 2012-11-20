@@ -1,0 +1,21 @@
+
+body { 
+    font-family: "Lucida Grande", "Segoe UI", Tahoma, Helvetica, Arial, sans-serif; 
+    font-size: 16px;
+    line-height: 32px;
+    margin:10px;
+}
+
+.logoWrapper {
+    position:relative;
+    width:50%;
+    right:100px;
+    margin-top: 40px;
+}
+
+.loginboxWrapper {
+    position:relative;
+    width:50%;
+    right:100px;
+    margin-top: 40px;
+}
