@@ -1,3 +1,4 @@
+// vim: sw=4 ts=4 et
 // The idea is to have one high level
 // Nitrogen object, created from NitrogenClass, that 
 // encapsulates everything in order to prevent collisions.
@@ -5,11 +6,15 @@
 function NitrogenClass(o) {
     this.$url = document.location.href;
     this.$div = document;
+    this.$anchor_root_path = document;
     this.$params = new Object();
     this.$event_queue = new Array();
     this.$event_is_running = false;
     this.$system_event_queue = new Array();
     this.$system_event_is_running = false;
+    this.$system_event_obj = null;
+    this.$going_away = false;
+    this.$live_validation_data_field = "LV_live_validation";
     return this;
 }
 
@@ -28,9 +33,29 @@ NitrogenClass.prototype.$anchor = function(anchor, target) {
     this.$target_path = this.$path_alias(target);
 }
 
+
+NitrogenClass.prototype.$anchor_root = function(anchor_root) {
+    this.$anchor_root_path = anchor_root;
+}
+
 NitrogenClass.prototype.$set_param = function(key, value) {
     this.$params[key] = value;
 }
+
+NitrogenClass.prototype.$destroy = function() {
+    document.comet_started = false;
+    this.$going_away = true;
+
+    // Clear the system event queue and abort any pending system events.
+    this.$system_event_queue = new Array();
+    if( this.$system_event_obj !== null ) {
+    this.$system_event_obj.abort();
+    }
+    this.$system_event_is_running = false;
+
+    // Let the event loop keep running until the event queue is empty. 
+}
+
 
 /*** EVENT QUEUE ***/
 
@@ -52,6 +77,9 @@ NitrogenClass.prototype.$queue_system_event = function(eventContext) {
 }
 
 NitrogenClass.prototype.$event_loop = function() {
+    // Create a local copy of this for setTimeout callbacks.
+    var this2 = this;
+
     // If no events are running and an event is queued, then fire it.
     if (!this.$system_event_is_running && this.$system_event_queue.length > 0) {
         var o = this.$system_event_queue.shift();
@@ -64,20 +92,27 @@ NitrogenClass.prototype.$event_loop = function() {
         this.$do_event(o.validationGroup, o.eventContext, o.extraParam, o.ajaxSettings);
     }
 
-    // No more events, sleep for 50 ms...
     if (this.$system_event_queue.length == 0 || this.$event_queue.length == 0) {
-        setTimeout("Nitrogen.$event_loop();", 50);
+    if( this.$going_away ) {
+        // $destroy has been called for this Nitrogen object
+        // and the event queue is empty - let the event loop stop.
         return;
+    }
+    else {
+        // No more events, sleep for 50 ms...
+        setTimeout( function() { this2.$event_loop() }, 50);
+        return;
+    }
     }
 
     // Events queued, but one is running, sleep for 10 ms...
     if (this.$event_is_running || this.$system_event_is_running) {
-        setTimeout("Nitrogen.$event_loop();", 10);
+        setTimeout( function() { this2.$event_loop() }, 10);
         return;
     }
 
     // Events queued, loop and grab it...
-    setTimeout("Nitrogen.$event_loop();", 1);
+    setTimeout( function() { this2.$event_loop() }, 1);
 }
 
 /*** VALIDATE AND SERIALIZE ***/
@@ -89,7 +124,8 @@ NitrogenClass.prototype.$validate_and_serialize = function(validationGroup) {
         n = this;
 
     jQuery(":input").not(".no_postback").each(function(i) {
-        if (this.validator && this.validator.group == this.validationGroup && !this.validator.validate()) {
+        var LV = Nitrogen.$get_validation(this);
+        if (LV && LV.group == validationGroup && !LV.validate()) {
             // Set a flag, but keep validating to show all messages.
             is_valid = false;
         } else {
@@ -100,6 +136,50 @@ NitrogenClass.prototype.$validate_and_serialize = function(validationGroup) {
     });
     // Return the params if valid. Otherwise, return null.
     return is_valid && params || null;
+}
+
+NitrogenClass.prototype.$add_validation = function(element, args) {
+    if($(element)){
+        if(!$(element).data(Nitrogen.$live_validation_data_field))
+            $(element).data(Nitrogen.$live_validation_data_field, new LiveValidation(element, args));
+        return Nitrogen.$get_validation(element);
+    } else
+        return null;
+}
+
+NitrogenClass.prototype.$get_validation = function(element) {
+    return $(element).data(Nitrogen.$live_validation_data_field);
+}
+
+// TODO: This needs to be made smarter. Right now, I'm pretty sure elements have
+// single validation groups, while it should be a list of groups that get validated
+NitrogenClass.prototype.$destroy_specific_validation = function(trigger, target) {
+    var v = NitrogenClass.$get_validation(target);
+    if(v.group==trigger)
+        Nitrogen.$destroy_target_validation(element);
+}
+
+NitrogenClass.prototype.$destroy_target_validation = function(element) {
+    var v = Nitrogen.$get_validation(element);
+    if(v) {
+        v.destroy();
+        $(element).data(Nitrogen.$live_validation_data_field,null);
+    }
+}
+
+NitrogenClass.prototype.$destroy_validation_group = function(validationGroup) {
+    jQuery(":input").not(".no_postback").each(function(i) {
+        var LV = Nitrogen.$get_validation(this);
+        if( LV && LV.group == validationGroup) {
+            Nitrogen.$destroy_target_validation(this);
+        }
+    });
+}
+
+NitrogenClass.prototype.$destroy_all_validation = function() {
+    $("*").each(function() {
+        Nitrogen.$destroy_target_validation(this);
+    });
 }
 
 NitrogenClass.prototype.$make_id = function(element) {
@@ -132,7 +212,7 @@ NitrogenClass.prototype.$do_event = function(validationGroup, eventContext, extr
     this.$event_is_running = true;
 
     // Run validation...
-    var validationParams = this.$validate_and_serialize(validationGroup);	
+    var validationParams = this.$validate_and_serialize(validationGroup);   
     if (validationParams == null) {
         this.$event_is_running = false;
         return;
@@ -150,12 +230,12 @@ NitrogenClass.prototype.$do_event = function(validationGroup, eventContext, extr
         success: function(data, textStatus) {
           n.$event_is_running = false;
           typeof s.success  == 'function' && s.success(data, textStatus) || eval(data);
-		    },
-		    error: function(xmlHttpRequest, textStatus, errorThrown) {
+            },
+            error: function(xmlHttpRequest, textStatus, errorThrown) {
           n.$event_is_running = false;
           typeof s.success == 'function' && s.error(xmlHttpRequest, textStatus, errorThrown);
         }
-    });			
+    });         
 }
 
 /*** SYSTEM EVENTS (FOR ASYNC) ***/
@@ -168,34 +248,161 @@ NitrogenClass.prototype.$do_system_event = function(eventContext) {
     // Assemble other parameters...
     var params = jQuery.extend( {}, n.$params, { eventContext: eventContext, is_system_event: 1 });
 
-    $.ajax({ 
-	       url: this.$url,
-	       type:'post',
-	       data: jQuery.param(params),
-	       dataType: 'text',
+    n.$system_event_obj = $.ajax({
+           url: this.$url,
+           type:'post',
+           data: jQuery.param(params),
+           dataType: 'text',
          cache: false,
-	       success: function(data, textStatus) {
+           success: function(data, textStatus) {
             n.$system_event_is_running = false;
+            n.$system_event_obj = null;
             // A system event shouldn't clobber the pageContext.
             // Easiest to cacount for it here.
             var pc = n.$params["pageContext"];
             eval(data);
             n.$set_param("pageContext", pc);
-	       },
-	       error: function(xmlHttpRequest, textStatus, errorThrown) {
+           },
+           error: function(xmlHttpRequest, textStatus, errorThrown) {
             n.$system_event_is_running = false;
-	       }
-	   });                     
+            n.$system_event_obj = null;
+           }
+       });                     
 }
 
 /*** FILE UPLOAD ***/
-NitrogenClass.prototype.$upload = function(form) {
+/*NitrogenClass.prototype.$upload = function(form,input) {
     // Assemble other parameters...
     form.action = this.$url;
     form.pageContext.value = this.$params["pageContext"];
     form.submit();
     form.reset();
+}*/
+
+/*** GMAIL-STYLE UPLOAD ***/
+
+NitrogenClass.prototype.$send_pending_files = function(form,input) {
+    var file=null;
+    if(typeof(form.$nitrogen_pending_files)=="object")
+    {
+        // not a typo, doing an assignment here
+        while(file=form.$nitrogen_pending_files.shift())
+        {
+            file.submit();
+        }
+    }
 }
+
+NitrogenClass.prototype.$attach_upload_handle_dragdrop = function(form,input,settings) {
+    var thisNitro = this;
+    if(typeof(settings)=="undefined")
+        settings={};
+    if(typeof(form.$nitrogen_pending_files)=="undefined")
+        form.$nitrogen_pending_files = [];
+
+    jQuery.getScript("/nitrogen/jquery.fileupload.min.js",function(){
+        var dropzone = jQuery(form).children(".upload_drop");
+    
+        jQuery(input).fileupload({
+            dropZone:(settings.droppable ? dropzone : null),
+            singleFileUploads:true,
+            sequentialUploads:true,
+            url:thisNitro.$url,
+            paramName:"file",
+            formData: function() {
+                form.elements["pageContext"].value = thisNitro.$params["pageContext"];
+                var d = jQuery(form).serializeArray();
+                return d;
+            },
+            start: function(e) {
+                form.pageContext.value = thisNitro.$params["pageContext"];
+                jQuery(form).children(".upload_progress").fadeIn().text("Uploading...");
+            },
+            progressall: function(e,data) {
+                var prog = parseInt(data.loaded / data.total * 100,10);
+                // TODO: Convert this to a progress bar
+                // Neede to add #progress{} element to continue with that
+                jQuery(form).children(".upload_progress").text(prog + "% (" + data.loaded + "/" + data.total + " bytes)");
+            },
+            progress: function(e,data) {
+                // Single file progress
+            },
+            send: function(e,data) {
+            },
+            stop: function(e,data) {
+                
+            },
+            always: function(e,data) {
+            },
+            fail: function(e,data, options) {
+                Nitrogen.$increment_pending_upload_counter(form,-1);
+            },
+            add: function(e,data) {
+                jQuery.each(data.files,function(i,f) {
+                    // Let's add the visual list of pending files
+                    jQuery(form).children(".upload_droplist")
+                        .prepend(jQuery("<li></li>").attr("filename",f.name).text(f.name));
+                    Nitrogen.$increment_pending_upload_counter(form,1);
+                });
+                if(settings.autoupload)
+                    data.submit();
+                else
+                    form.$nitrogen_pending_files.push(data);
+            },
+            done: function(e,data) {
+                if(typeof data.result == "string") {
+                    // Good browsers will use XHR file transfers, and so this
+                    // will return a string
+                    var Postback = data.result;
+                } else if(typeof data.result == "object") {
+                    // Crappy browsers (IE9 and below) will do the transfer
+                    // as with an iframe and return a document-type object
+                    var Postback = data.result[0].body.innerHTML;
+                } else {
+                    // IE also has data.result as "undefined" on failure
+                    // So let's just treat it as an empty string
+                    var Postback = "";
+                }
+
+                jQuery.globalEval(Postback);
+                Nitrogen.$increment_pending_upload_counter(form,-1);
+            }
+        })
+    })
+}
+
+NitrogenClass.prototype.$increment_pending_upload_counter = function(form,incrementer) {
+    var counter = $(form).data("pending_uploads");
+    if(typeof(counter)=="undefined")
+        counter=0;
+    counter+=incrementer;
+    $(form).data("pending_uploads",counter);
+    if(counter==0)
+    {
+        jQuery(form).children(".upload_progress").fadeOut();
+        Nitrogen.$alert_unfinished_files(form);
+    }
+}
+
+
+NitrogenClass.prototype.$upload_finished = function(Name) {
+    jQuery(".upload_droplist").children("li[filename=\"" + Name + "\"]")
+        .css("text-decoration","line-through")
+        .addClass("upload_successful")
+        .fadeOut();
+}
+
+NitrogenClass.prototype.$alert_unfinished_files = function(form) {
+    var files = $(form).find(".upload_droplist li:not(.upload_successful):visible");
+    if(files.length > 0)
+    {
+        $(form).find(".upload_droplist li:not(.upload_successful)").css("color","red").fadeOut("slow");
+
+        var filenames = $(files).get().map(function(f) { return $(f).text() }).join("\r\n");
+        alert("There was an error uploading the following file(s):\r\n" + filenames + "\r\n\r\nThis is likely due to the file(s) being too large or a misconfiguration on the server");
+    }
+} 
+
 
 /*** PATH LOOKUPS ***/
 
@@ -226,7 +433,7 @@ function objs(path, anchor) {
 
     // Selector is "page", so return the document...
     if (path == "page" || path == ".page") {
-	return jQuery(document);
+    return jQuery(document);
     }
 
     // Replace "##" with ".wfid_"...
@@ -258,19 +465,20 @@ function objs(path, anchor) {
         return jQuery(path);
     }    
 
+    var anchor_obj = jQuery(Nitrogen.$anchor_root_path).find(anchor);
     // Find all results under the anchor...
-    var results = jQuery(anchor).find(path);
+    var results = anchor_obj.find(path);
     if (results.length > 0) {
-	return results;
+    return results;
     }
     
     // If no results under the anchor, then try on each parent, moving upwards...
-    var results = jQuery(anchor).parents();
+    var results = anchor_obj.parentsUntil( Nitrogen.$anchor_root_path );
     for (var i=0; i<results.length; i++) {
-	var results2 = jQuery(results.get(i)).find(path);
-	if (results2.length > 0) {
-	    return results2;
-	}		
+    var results2 = jQuery(results.get(i)).find(path);
+    if (results2.length > 0) {
+        return results2;
+    }       
     }
 
     // No results, so try in context of entire page.
@@ -346,7 +554,7 @@ NitrogenClass.prototype.$go_next = function(controlID) {
 
 NitrogenClass.prototype.$disable_selection = function(element) {
     element.onselectstart = function() {
-	return false;
+    return false;
     };
     element.unselectable = "on";
     element.style.MozUserSelect = "none";
@@ -385,7 +593,7 @@ NitrogenClass.prototype.$encode_arguments_object = function(Obj) {
     if (! Bert) { alert("Bert.js library not included in template.") }
     var a = new Array();
     for (var i=0; i<Obj.length; i++) {
-	a.push(Obj[i]);
+    a.push(Obj[i]);
     }
     var s = Bert.encode(a);
     return "args=" + this.$urlencode(s);
@@ -454,16 +662,24 @@ NitrogenClass.prototype.$sortitem = function(el, sortTag) {
 NitrogenClass.prototype.$sortblock = function(el, sortOptions, sortPostbackInfo) {
     var n = this;
     sortOptions.update = function() {
-	var sortItems = "";
-	for (var i=0; i<this.childNodes.length; i++) {
-	    var childNode = this.childNodes[i];
-	    if (sortItems != "") sortItems += ",";
-	    if (childNode.$sort_tag) sortItems += childNode.$sort_tag;
-	}
-	n.$queue_event(null, sortPostbackInfo, "sort_items=" + sortItems);
+    var sortItems = "";
+    for (var i=0; i<this.childNodes.length; i++) {
+        var childNode = this.childNodes[i];
+        if (sortItems != "") sortItems += ",";
+        if (childNode.$sort_tag) sortItems += childNode.$sort_tag;
+    }
+    n.$queue_event(null, sortPostbackInfo, "sort_items=" + sortItems);
     };
     objs(el).sortable(sortOptions);
 }
+
+/*** transfer content of an alien elment into a nitrogen form
+ * used in src/elements/other/element_recaptcha.erl
+ * ***/
+NitrogenClass.prototype.$from_alien = function(nativeID) {
+    var input = $("input#" + nativeID).val();
+    objs(nativeID).val(input);
+};
 
 var Nitrogen = new NitrogenClass();
 var page = document;
