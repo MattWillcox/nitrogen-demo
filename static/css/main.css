@@ -6,16 +6,26 @@ body {
     margin:10px;
 }
 
+.bodyWrapper {
+    margin:20px;
+    height:450px;
+}
+
 .logoWrapper {
     position:relative;
-    width:50%;
-    right:100px;
-    margin-top: 40px;
+    width:40%;
+    height:400px;
+    border-style:solid;
+    border-width:1px;
+    border-color:black;
+    margin:10px;
+    left:0px;
 }
 
 .loginboxWrapper {
     position:relative;
-    width:50%;
-    right:100px;
-    margin-top: 40px;
+    top:-400px;
+    width:40%;
+    margin:10px;
+    left:50%;
 }

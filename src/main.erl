@@ -18,42 +18,31 @@ body() ->
 				]
 			},
 			#panel{
-				class=logoWrapper,
-				style="
-					position:absolute;
-    				width:40%;
-    				height:80%;
-    				border-style:solid;
-    				border-width:1px;
-    				border-color:black;
-    				margin:10px;
-    				left:0px;
-    				",
+				class=bodyWrapper,
 				body=[
-					"logo comes here!"
-				]
-			},
-			#panel{
-				class=loginboxWrapper,
-				id=loginbox,
-				style="
-					position:absolute;
-    				width:40%;
-    				margin:10px;
-    				left:50%;
-    				",
-				body=[
-					#label{text="Email"},
-					#textbox{},
-					#label{text="Password"},
-					#password{},
-					#br{},
-					#button{text="login"},
-					#p{},
-					#link {text = "Don't have account yet?", url = "/register"},
-					" or ",
-					#link {text = "Forgot password?", url = "/password"},
-					#p{}
+					#panel{
+						class=logoWrapper,
+						body=[
+							"logo comes here!"
+						]
+					},
+					#panel{
+						class=loginboxWrapper,
+						id=loginbox,
+						body=[
+							#label{text="Email"},
+							#textbox{},
+							#label{text="Password"},
+							#password{},
+							#br{},
+							#button{text="login"},
+							#p{},
+							#link {text = "Don't have account yet?", url = "/register"},
+							" or ",
+							#link {text = "Forgot password?", url = "/password"},
+							#p{}
+						]
+					}
 				]
 			}
 		]}.

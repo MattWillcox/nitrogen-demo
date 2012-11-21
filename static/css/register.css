@@ -6,20 +6,7 @@ body {
     margin:10px;
 }
 
-
-p span.LV_validation_message.LV_invalid {
-    vertical-align: middle;
-    display: inline;
-    line-height: 100%;
-    position: absolute;
-    font-weight:bold;
-    margin: 0px 0px 0px 7px;
-    padding: 5px 7px 5px 7px;
-    opacity: 0.8;
-    -moz-opacity: 0.8;
-    filter:alpha(opacity=80);
-
-    color:#FFFFFF;
-    background-color: #000000;
-    border: solid 2px #D0D0C0;
+h1 {
+    margin: 10px;
 }
+

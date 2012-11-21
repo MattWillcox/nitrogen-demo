@@ -29,13 +29,10 @@ body() ->
 	        #h1 {text = "Create New Account"},
 	        #label {text = "Please enter your Email address"},
 	        #textbox { id=idTextbox, class=idTextbox, text=""},
-	        #p{},
 	        #label {text= "Please enter new password"},
 	        #password { id=pwTextbox, class=pwTextbox, text=""},
-	        #p{},
 	        #label {text= "Please enter password again to confirm"},
 	        #password { id=pwConfirmTextbox, class=pwConfirmTextbox, text=""},
-	        #p{},
 	        #br{},
 	        #button { id=registerButton, text = "Create New Account", postback=register},
 	        #br{}

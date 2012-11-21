@@ -6,5 +6,5 @@
               {mod,{nitrogen_app,[]}},
               {env,[]},
               {modules,[index,login,main,nitrogen_app,nitrogen_mochiweb,
-                        nitrogen_sup,pizza,register,twitter,
+                        nitrogen_sup,password,pizza,register,twitter,
                         written_comparison]}]}.
