@@ -7,6 +7,8 @@ main() -> #template { file="./site/templates/bare.html" }.
 
 title() -> "Home Page".
 
+head()->"<title>TTTTT</title>".
+
 body() ->
     #container_12 { body=[
         #grid_8 { alpha=true, prefix=2, suffix=2, omega=true, body=inner_body() }
@@ -28,6 +30,8 @@ inner_body() ->
 	#link {text = "Click here to access our top secrets (Twitter Page)", url = "/twitter"},
 	#p{},
 	#link {text = "Click here to access our top secrets (Features Page)", url = "/pizza"},
+	#p{},
+	#link {text = "Click here to access our top secrets (Chat Page)", url = "/chat"},
 	#p{},
 	#link {text = "Click here to access Comparisons (No restrictions)", url = "/written_comparison"}
         
