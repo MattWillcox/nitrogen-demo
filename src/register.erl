@@ -11,7 +11,7 @@ title() -> "href Tetris".
 body() ->
     wf:wire(registerButton, idTextbox, #validate {validators=[
         #is_required { text="Required." },
-        #is_email { text="Invalie Email Address" }
+        #is_email { text="Invalid Email Address" }
     ]}),
 	wf:wire(registerButton, pwTextbox, #validate { validators=[
 	    #is_required { text="Required." },
@@ -42,10 +42,11 @@ body() ->
     ].
 
 event(register) ->
-    wf:wire(registerButton, #hide{} ),
-    wf:flash( "Thank you for creating new account!" ),
-    timer:sleep(1000),
-    wf:redirect("/main");
-
-event(_) -> ok.
-
+	Usr = wf:q(idTextbox),
+	Password = wf:q(pwTextbox),
+	case usr:register(Usr,Password) of
+		{error, Reason} -> wf:wire(#alert{text=Reason});
+		ID when is_integer(ID) -> 
+			wf:wire(#alert{text="Registered! Please Log In"}),
+			wf:redirect("/main")
+	end.

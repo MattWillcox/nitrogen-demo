@@ -12,7 +12,7 @@ body() ->
     [
 	    #panel{
 	        body=[
-	        #h1 {text = "Password Reset"},
+	        #h1 {text = "Password Reset (not implemented!)"},
 	        #label {text = "Please enter your Email address"},
 	        #textbox { id=idTextbox, class=idTextbox, text=""},
 	        #p{},
