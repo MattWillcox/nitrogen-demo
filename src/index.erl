@@ -20,7 +20,7 @@ inner_body() ->
         Other -> Other
     end,
     [
-        #h1 {text = "Welcome to Our Demo Home Page"},
+        #h1 {text = "Welcome to Our Demo Home Page!"},
         #p{},
     #span {text = "Current User: "},
     #span {style = "font-weight: bold;", text = CurrentUser},
