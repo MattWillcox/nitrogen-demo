@@ -8,7 +8,6 @@ main() -> #template { file="./site/templates/bare.html" }.
 title() -> "Home Page".
 
 head()->"<title>TTTTT</title>".
->>>>>>> upstream/master
 
 body() ->
     #container_12 { body=[
@@ -38,10 +37,10 @@ inner_body() ->
     
 event(logout) ->
     wf:clear_session(),
-    wf:redirect("/index").
-=======
+    wf:redirect("/index"),
+
 	CurrentUser = case wf:user() of
-		:wqundefined -> "(Anonymous)";
+		undefined -> "(Anonymous)";
 		Other -> Other
 	end,
     [
@@ -61,8 +60,3 @@ event(logout) ->
 	#link {text = "Click here to access Comparisons (No restrictions)", url = "/written_comparison"}
         
     ].
-	
-event(logout) ->
-	wf:clear_session(),
-	wf:redirect("/index").
->>>>>>> upstream/master
