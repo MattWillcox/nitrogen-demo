@@ -12,13 +12,30 @@ body() ->
  Body = [
 
 #container_12 { body = [
-        #grid_12 { body = [ #span { text = "NAVIGATOR BAR"}]},
+        #grid_12 { style = "border: 10px solid black; text-align: center; margin-bottom: 10px", body = [ 
+        #span { text = "HOME \t| PROFILE | LEADERBOARD | FRIENDS"}]},
+
         #grid_clear{},
-        #grid_3 { alpha= true, omega = true, body = [
+        #grid_4 { style = "font-size: small;", alpha= true, omega = true, body = [
         #image { style = "width: 90%", image = "/images/logo.jpg"},
-        #span { text = "Instructions"}
+        
+        [
+        "Instructions:
+        Create an account to the right of the game screen.
+        Once you are logged in, hit start to beging searching
+        for an opponent. Your statistics are stored under the
+        'Profile' link at the top. 
+        <p>
+        Controls:
+        Use the arrows keys to move the pieces. 
+        Left and right move the pieces sideways, 
+        the Up arrow will rotate itand the down 
+        arrow will move your piece down faster.
+        "
+        ]
+
         ]},
-        #grid_3 { body = "GAME HERE?"},
+        #grid_4 { style = "border: 10px solid black; color: white; background-color: black; padding-bottom:500px;", body = "GAME HERE?"},
         #grid_2 { body = [
         #label { id = label1, class=temp, text="User Name" },
         #textbox { id=nameTextBox, next=emailTextBox },
