@@ -62,7 +62,9 @@ body() ->
 event(login) ->
 	Usr = wf:q(idTextbox),
 	Password = wf:q(pwTextbox),
-	case usr:login(Usr,Password) of
+	Salt = mochihex:to_hex(erlang:md5(Usr)),
+	HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
+	case usr:login(Usr,HashedPassword) of
 		{error, Reason} -> wf:wire(#alert{text=Reason});
 		ok -> 
 			wf:wire(loginbox, #hide{}),
