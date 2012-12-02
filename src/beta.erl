@@ -4,16 +4,32 @@
 -include_lib("nitrogen_core/include/wf.hrl").
 -include("records.hrl").
 
-main() -> #template { file="./site/templates/bare.html" }.
+main() -> #template { file="./site/templates/beta.html" }.
+
 
 title() -> "Hello from beta.erl!".
 
 body() -> 
- Body = [
+
+User = case wf:user() of
+undef -> "Guest";
+Other -> Other
+end,
+
+Body = [
 
 #container_12 { body = [
-        #grid_12 { style = "border: 10px solid black; text-align: center; margin-bottom: 10px", body = [ 
-        #span { text = "HOME \t| PROFILE | LEADERBOARD | FRIENDS"}]},
+        #grid_12 { style = "border: 10px solid grey; text-align: center;", body = [ 
+                #singlerow {style="width: 920px;", cells=[
+            #tablecell { align=center, body=#link { text="Home", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Leaderboard", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
+            #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Chat", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Logout", url = "/beta" }}
+        ]}]},
+        #panel { style = "text-align:right;", body = [#span{ text = "Currently logged in as: "},
+                        #span { id = currentUser, text = User}]},
 
         #grid_clear{},
         #grid_4 { style = "font-size: small;", alpha= true, omega = true, body = [
@@ -35,8 +51,9 @@ body() ->
         ]
 
         ]},
-        #grid_4 { style = "border: 10px solid black; color: white; background-color: black; padding-bottom:500px;", body = "GAME HERE?"},
-        #grid_2 { body = [
+        #grid_4 { id = game1, style = "border: 10px solid black; color: white; 
+        background-color: black; padding-bottom:470px;", body = "GAME HERE?"},
+        #grid_4 { id = game2, body = [
         #label { id = label1, class=temp, text="User Name" },
         #textbox { id=nameTextBox, next=emailTextBox },
 
@@ -48,7 +65,7 @@ body() ->
 
         #label { id = label4, class=temp, text="Confirm" },
         #password { id=confirmTextBox, next=continueButton },
-
+        #br{},
         #button { id=continueButton, text="Continue", postback=continue } ]}
     ]}
     ],
@@ -76,8 +93,13 @@ body() ->
 
 
 event(continue) ->
+        User = wf:q(nameTextBox),
+        wf:user(User),
         Name = wf:q(nameTextBox),
         Message = wf:f("Welcome ~s! Your information is valid.", [Name]),
+        wf:set(currentUser, User),
+        wf:replace(game2, #grid_4 {style="border: 10px solid black; color: white; 
+            background-color: black; padding-bottom:470px;", body = "Searching for Opponent"}),
         wf:flash(Message),
         wf:remove(nameTextBox),
         wf:remove(emailTextBox),
@@ -88,7 +110,5 @@ event(continue) ->
         wf:remove(label2),
         wf:remove(label3),
         wf:remove(label4);
-
-
 
 event(_) -> ok.

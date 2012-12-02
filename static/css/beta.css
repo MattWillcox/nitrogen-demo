@@ -1,0 +1,13 @@
+body { 
+    font-family: "Lucida Grande", "Segoe UI", Tahoma, Helvetica, Arial, sans-serif; 
+    font-size: 16px;
+    line-height: 32px;
+    margin:10px;
+}
+
+
+th, td {
+    border: 1px solid black;
+    overflow: hidden;
+    width: 100px;
+}
