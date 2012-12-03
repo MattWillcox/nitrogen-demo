@@ -63,7 +63,7 @@ Your browser does not support the canvas element.
 
 
 <script type="text/javascript">
-
+    var canvasWidth = 320;
     var gl;
     var drawInterval;
     var canvas = document.getElementById("canvas");
@@ -201,6 +201,31 @@ Your browser does not support the canvas element.
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
         squareVertexColorBuffer.itemSize = 4;
         squareVertexColorBuffer.numItems = 4;
+
+        ///////////////////////////////////////////////////////////
+
+        squareVertexPositionBuffer2 = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+  
+        vertices2 = [
+             1.0, 1.0, 0.0,
+            -1.0, 1.0, 0.0,
+             1.0, -1.0, 0.0,
+            -1.0, -1.0, 0.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+        squareVertexPositionBuffer2.itemSize = 3;
+        squareVertexPositionBuffer2.numItems = 4;
+
+        squareVertexColorBuffer2 = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+        colors2 = []
+        for (var i = 0; i < 4; i++) {
+            colors2 = colors2.concat([0.5, 0.5, 1.0, 1.0]);
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        squareVertexColorBuffer2.itemSize = 4;
+        squareVertexColorBuffer2.numItems = 4;
     }
 
 
@@ -265,41 +290,156 @@ Your browser does not support the canvas element.
         mvPopMatrix();
     }
 
-    function drawRec(x, y) { // draw rectangles
+    function DrawOutline(color2) {
 
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
 
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
-
+        vertices2 = [
+             1.5, 2.85, 0.0,
+             1.6, 2.85, 0.0,
+             1.5, -2.9, 0.0,
+             1.6, -2.9, 0.0
+        ];
         mat4.identity(mvMatrix);
+        mat4.translate(mvMatrix, [0, 0, -7.0]);
 
-        var vx = -1.25 - 0.125;
-        var vy = 2.75 + 0.25;
-        var d = 0.3;
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+        squareVertexPositionBuffer2.itemSize = 3;
+        squareVertexPositionBuffer2.numItems = 4;
 
-        mat4.translate(mvMatrix, [vx + x * d, vy - y * d, -7.0]);
+        squareVertexColorBuffer2 = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+        colors2 = []
+        for (var i = 0; i < 4; i++) {
+            //colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
+            colors2 = colors2.concat(color2);
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors2), gl.STATIC_DRAW);
+        squareVertexColorBuffer2.itemSize = 4;
+        squareVertexColorBuffer2.numItems = 4;
 
+        mvPushMatrix();
+        //mat4.rotate(mvMatrix, degToRad(rSquare), [0, 0, 0]);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
         setMatrixUniforms();
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer2.numItems);
+
+        mvPopMatrix();
+
+        //////////////////////////////////////////////////////////////////////////////////
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+
+        if (canvasWidth > 320) {
+            vertices2 = [
+                 -1.55, 2.85, 0.0,
+                 -1.65, 2.85, 0.0,
+                 -1.55, -2.9, 0.0,
+                 -1.65, -2.9, 0.0
+            ];
+        } else {
+            vertices2 = [
+                  -1.5, 2.85, 0.0,
+                  -1.6, 2.85, 0.0,
+                  -1.5, -2.9, 0.0,
+                  -1.6, -2.9, 0.0
+            ];
+
+
+        }
+        mat4.identity(mvMatrix);
+        mat4.translate(mvMatrix, [0, 0, -7.0]);
+
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+        squareVertexPositionBuffer2.itemSize = 3;
+        squareVertexPositionBuffer2.numItems = 4;
+
+        squareVertexColorBuffer2 = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+        colors2 = []
+        for (var i = 0; i < 4; i++) {
+            //colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
+            colors2 = colors2.concat(color2);
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors2), gl.STATIC_DRAW);
+        squareVertexColorBuffer2.itemSize = 4;
+        squareVertexColorBuffer2.numItems = 4;
+
+        mvPushMatrix();
+        //mat4.rotate(mvMatrix, degToRad(rSquare), [0, 0, 0]);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+        setMatrixUniforms();
+
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer2.numItems);
+
+        mvPopMatrix();
+        //////////////////////////////////////////////////////////////////////////////////////
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+
+        vertices2 = [
+             -1.6, -2.85, 0.0,
+             1.6, -2.85, 0.0,
+             -1.6, -2.9, 0.0,
+             1.6, -2.9, 0.0
+        ];
+        mat4.identity(mvMatrix);
+        mat4.translate(mvMatrix, [0, 0, -7.0]);
+
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+        squareVertexPositionBuffer2.itemSize = 3;
+        squareVertexPositionBuffer2.numItems = 4;
+
+        squareVertexColorBuffer2 = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+        colors2 = []
+        for (var i = 0; i < 4; i++) {
+            //colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
+            colors2 = colors2.concat(color2);
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors2), gl.STATIC_DRAW);
+        squareVertexColorBuffer2.itemSize = 4;
+        squareVertexColorBuffer2.numItems = 4;
+
+        mvPushMatrix();
+        //mat4.rotate(mvMatrix, degToRad(rSquare), [0, 0, 0]);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+        setMatrixUniforms();
+
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer2.numItems);
+
+        mvPopMatrix();
+
     }
-
-
-
-
-
 
     function draw() {
 
 	initGL(canvas);
         initShaders();
         initBuffers();
-        gl.clearColor(0.5, 0.5, 0.7, 1.0);
+        gl.clearColor(1.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+    ////////////////////////////////////////////////////////////////////
+        DrawOutline([0.0, 0.5, 1.0, 1.0]);
 
 	// draw board
 	for (var x = 0; x < engine.getWidth(); x++) {
@@ -307,7 +447,7 @@ Your browser does not support the canvas element.
 		for (var y = 0; y < engine.getHeight(); y++) {
 			// ruszyc pedzel w prawo
 			if (engine.getBoard(x, y) == 0) continue;
-			drawScene(x,y, [1.0,0.0,0.0,1.0]);
+			drawScene(x,y, [1.0,0.9,0.4,1.0]);
 		}
 	}
 

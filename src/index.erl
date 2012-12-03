@@ -33,6 +33,8 @@ inner_body() ->
 	#p{},
 	#link {text = "Click here to access our top secrets (Chat Page)", url = "/chat"},
 	#p{},
+        #link {text = "Click here to access our top secrets (Tetris Test Page)", url = "/tetris"},
+	#p{},
 	#link {text = "Click here to access Comparisons (No restrictions)", url = "/written_comparison"}
         
     ].
