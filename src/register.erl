@@ -28,11 +28,11 @@ body() ->
 	        body=[
 	        #h1 {text = "Create New Account"},
 	        #label {text = "Please enter your Email address"},
-	        #textbox { id=idTextbox, class=idTextbox, text="", next=pwTextbox},
+	        #textbox { id=idTextbox, class=idTextbox, text=""},
 	        #label {text= "Please enter new password"},
-	        #password { id=pwTextbox, class=pwTextbox, text="", next=pwConfirmTextbox},
+	        #password { id=pwTextbox, class=pwTextbox, text=""},
 	        #label {text= "Please enter password again to confirm"},
-	        #password { id=pwConfirmTextbox, class=pwConfirmTextbox, text="", next=registerButton},
+	        #password { id=pwConfirmTextbox, class=pwConfirmTextbox, text=""},
 	        #br{},
 	        #button { id=registerButton, text = "Create New Account", postback=register},
 	        #br{}

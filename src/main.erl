@@ -43,9 +43,9 @@ body() ->
 						id=loginbox,
 						body=[
 							#label{text="Email"},
-							#textbox{ id=idTextbox, class=idTextbox, next= pwTextbox },
+							#textbox{ id=idTextbox, class=idTextbox },
 							#label{text="Password"},
-							#password{ id=pwTextbox, class=pwTextbox, next=loginButton },
+							#password{ id=pwTextbox, class=pwTextbox },
 							#br{},
 							#button{id=loginButton, text="Login", postback=login},
 							#p{},
