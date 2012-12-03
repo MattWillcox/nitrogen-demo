@@ -28,6 +28,4 @@ resetPassword(Usr, Password) ->
 	if
 		Exists -> db:q("update players SET password=? where user =?",[Password,Usr]);
 		true -> {error, "User name does not exist"}
-=======
->>>>>>> 733267aabb6be092d4177ff17863ecfbbce0646b
 	end.
