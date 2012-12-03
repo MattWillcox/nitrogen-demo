@@ -11,3 +11,11 @@ th, td {
     overflow: hidden;
     width: 100px;
 }
+
+span {
+	font-size: 12px;
+}
+
+label {
+	font-size: 12px;
+}

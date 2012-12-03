@@ -11,9 +11,9 @@ title() -> "Hello from beta.erl!".
 
 body() -> 
 
-User = case wf:user() of
-undef -> "Guest";
-Other -> Other
+CurrentUser = case wf:cookie(pastUser) of
+    undefined -> "Guest";
+    Other -> Other
 end,
 
 Body = [
@@ -29,7 +29,7 @@ Body = [
             #tablecell { align=center, body=#link { text="Logout", url = "/beta" }}
         ]}]},
         #panel { style = "text-align:right;", body = [#span{ text = "Currently logged in as: "},
-                        #span { id = currentUser, text = User}]},
+                        #span { id = currentUser, text = CurrentUser}]},
 
         #grid_clear{},
         #grid_4 { style = "font-size: small;", alpha= true, omega = true, body = [
@@ -94,21 +94,23 @@ Body = [
 
 event(continue) ->
         User = wf:q(nameTextBox),
-        wf:user(User),
-        Name = wf:q(nameTextBox),
-        Message = wf:f("Welcome ~s! Your information is valid.", [Name]),
-        wf:set(currentUser, User),
-        wf:replace(game2, #grid_4 {style="border: 10px solid black; color: white; 
-            background-color: black; padding-bottom:470px;", body = "Searching for Opponent"}),
-        wf:flash(Message),
-        wf:remove(nameTextBox),
-        wf:remove(emailTextBox),
-        wf:remove(passwordTextBox),
-        wf:remove(confirmTextBox),
-        wf:remove(continueButton),
-        wf:remove(label1),
-        wf:remove(label2),
-        wf:remove(label3),
-        wf:remove(label4);
+        Password = wf:q(pwTextbox),
+        Salt = mochihex:to_hex(erlang:md5(User)),
+       %%HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
+            wf:user(User),
+            wf:set(currentUser, User),
+            wf:cookie(pastUser, User),
+            wf:replace(game2, #grid_4 { body = [#span{ text = "Search for opponent"},
+                                                #br{},
+                                                #button { id=searchButton, text="Search" }]}),
+            wf:remove(nameTextBox),
+            wf:remove(emailTextBox),
+            wf:remove(passwordTextBox),
+            wf:remove(confirmTextBox),
+            wf:remove(continueButton),
+            wf:remove(label1),
+            wf:remove(label2),
+            wf:remove(label3),
+            wf:remove(label4);
 
 event(_) -> ok.
