@@ -9,7 +9,7 @@ main() ->
 		false -> wf:redirect_to_login("/tetrislogin")
 	end.
 
-main_authorized() -> #template{file="site/templates/main.html"}.
+main_authorized() -> #template{file="site/templates/beta.html"}.
 
 
 title() -> "href Tetris".
