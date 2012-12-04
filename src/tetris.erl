@@ -36,19 +36,18 @@ event(comet_event) ->
     wf:send_global(my_pool, {message, "Clicked"});
 
 event(test_event) ->
-	A_Number= 0,
-	wf:wire("obj(A_Number)=test"),
-	message = A_Number,
-    wf:send_global(my_pool, message);
+%% trying to reference var test in the Template file 
+    %%message = wf:q(test),
+	message = test,
+    wf:send_global(my_pool, {message, "CometT"}); 
 
 event(_) -> ok.
 
 comet_loop() ->
     receive 
-	{message} -> 
-            wf:wire("test = test+10"),
-	    wf:wire("textfield.textContent = test"),
-	    wf:insert_bottom(placeholder, "Clicked"),
+	{message, "CometT"} -> 
+	    wf:wire("textfield.textContent = obj('message')"),
+	    wf:insert_bottom(placeholder, "Comet"),
 	wf:wire("obj('placeholder').scrollTop = obj('placeholder').scrollHeight;"),
 
 	wf:flush();
