@@ -18,3 +18,5 @@ INSERT INTO game_history (user1, user2, winner) VALUES ('noob2', 'noob5', 'noob2
 INSERT INTO game_history (user1, user2, winner) VALUES ('noob1', 'noob6', 'noob6');
 INSERT INTO game_history (user1, user2, winner) VALUES ('noob1', 'noob5', 'noob5');
 INSERT INTO game_history (user1, user2, winner) VALUES ('noob3', 'noob4', 'noob3');
+
+ALTER TABLE players ADD SecretQuestionAnswer varchar(255);
