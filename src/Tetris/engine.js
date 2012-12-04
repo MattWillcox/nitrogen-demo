@@ -14,6 +14,7 @@ pieces = [
 		[ 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 ] ];
 
 function Engine() {
+    var colide = false;
 	this.width = 10;	// width of the board (in squares)
 	this.height = 20;	// height of the board
 	this.board = [];	// fallen pieces (accessing: y * width + x)
@@ -38,6 +39,7 @@ function Engine() {
 	this.score = 0;
 	this.level = 1;
 	this.linesCompleted = 0;
+	this.linesCompletedCount = 0;
 	
 	this.delay = 500;
 	
@@ -102,7 +104,16 @@ function Engine() {
 	this.getNextPiece = function(x, y) {
 		return pieces[Math.floor(this.nextPiece * 7)][y * 4 + x];
 	};
-
+	this.getlinesCompletedCount = function () {
+	    return this.linesCompletedCount;
+	};
+    //////////////////////////////////////////////////////////
+	this.resetlinesCompleted = function () {
+	    var temp = this.getlinesCompletedCount;
+	    this.linesCompletedCount = 0;
+	    return temp;
+	};
+    //////////////////////////////////////////////////////////
 	this.newPiece = function() {
 		this.instantDrop = false;
 		newcolor = 1;
@@ -193,7 +204,7 @@ function Engine() {
 		}
 	}
 	
-	this.work = function() {
+	this.work = function () {
 		if (this.paused)
 			return;
 
@@ -242,8 +253,13 @@ function Engine() {
 				for (var x = 0; x < this.width; x++) {
 					sum += this.board[y * this.width + x];
 				}
-				
 				if (sum == this.width) {	// got line completed
+				    if (colide == false) {
+				        this.linesCompletedCount = 0;
+				        colide = true;
+				    }
+
+				    this.linesCompletedCount++;
 					this.linesCompleted++;
 					
 					if (this.linesCompleted >= 1 && this.linesCompleted <= 90) {
@@ -267,14 +283,13 @@ function Engine() {
 					}
 				}
 			}
-			
+			colide = false;
 			this.newPiece();
 		}
 		
 		return willCollide;
 	}
-	
-	this.start = function() {
+		this.start = function() {
 		var self = this;
 		if (!this.paused) {
 			setTimeout(function() {

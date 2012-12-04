@@ -15,18 +15,29 @@
 
 <table><tr> 
  
+<td valign="top"> 
+<p>Score: <span id="score"></span></p> 
+<p>Level: <span id="level"></span></p> 
+<p>Lines completed once: <span id="co"></span></p> 
+<p>Lines completed: <span id="lines"></span></p> 
+ 
+<h2>Top 10 highscores</h2><table><tr><td>7014</td><td>OLA:*</td></tr><tr><td>6986</td><td>Neos</td></tr><tr><td>6310</td><td>:*</td></tr><tr><td>6306</td><td>Ola</td></tr><tr><td>6269</td><td>Neos</td></tr><tr><td>6080</td><td>Ola</td></tr><tr><td>5939</td><td>:*</td></tr><tr><td>5925</td><td>:)</td></tr><tr><td>5851</td><td>:)</td></tr><tr><td>5724</td><td>:)</td></tr></table></td>
+
+
+
 <td> 
 <canvas id="canvas" style="border: none;" width="800" height="600">
 Your browser does not support the canvas element.
 </canvas>
 </td> 
- 
+
 <td valign="top"> 
-<p>Score: <span id="score"></span></p> 
-<p>Level: <span id="level"></span></p> 
-<p>Lines completed: <span id="lines"></span></p> 
+<p>Score: <span id="score2"></span></p> 
+<p>Level: <span id="level2"></span></p> 
+<p>Lines completed: <span id="lines2"></span></p> 
  
-<h2>Top 10 highscores</h2><table><tr><td>7014</td><td>OLA:*</td></tr><tr><td>6986</td><td>Neos</td></tr><tr><td>6310</td><td>:*</td></tr><tr><td>6306</td><td>Ola</td></tr><tr><td>6269</td><td>Neos</td></tr><tr><td>6080</td><td>Ola</td></tr><tr><td>5939</td><td>:*</td></tr><tr><td>5925</td><td>:)</td></tr><tr><td>5851</td><td>:)</td></tr><tr><td>5724</td><td>:)</td></tr></table></td> 
+<h2>Top 10 highscores</h2><table><tr><td>7014</td><td>OLA:*</td></tr><tr><td>6986</td><td>Neos</td></tr><tr><td>6310</td><td>:*</td></tr><tr><td>6306</td><td>Ola</td></tr><tr><td>6269</td><td>Neos</td></tr><tr><td>6080</td><td>Ola</td></tr><tr><td>5939</td><td>:*</td></tr><tr><td>5925</td><td>:)</td></tr><tr><td>5851</td><td>:)</td></tr><tr><td>5724</td><td>:)</td></tr></table></td>
+  
  
 </tr></table> 
 <script type="text/javascript" src="jquery-1.5.2.min.js"></script> 
@@ -70,11 +81,6 @@ Your browser does not support the canvas element.
     var canvas = document.getElementById("canvas");
     //var context = canvas.getContext("2d");
     var engine = new Engine();
-
-
-
-
-
 
     function initGL(canvas) {
         var newcolor = 1;
@@ -787,6 +793,7 @@ Your browser does not support the canvas element.
  	
 	document.getElementById("score").innerHTML = engine.getScore();
 	document.getElementById("level").innerHTML = engine.getLevel();
+	document.getElementById("co").innerHTML = engine.getlinesCompletedCount();
 	document.getElementById("lines").innerHTML = engine.getLinesCompleted();
 	
 	if (engine.isGameOver()) {
