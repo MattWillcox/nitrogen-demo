@@ -2,30 +2,44 @@
 -compile(export_all).
 -include_lib("nitrogen_core/include/wf.hrl").
 
-login(Usr,Password) ->
-	Exists = db:qexists("select * from players where user =? and password=?",[Usr,Password]),
-	if 
-		Exists 	-> wf:user(Usr); %% we have a match, set session
-		true -> {error, "User and Password do not match"}
+login(Email,Password) ->
+ 	Salt = mochihex:to_hex(erlang:md5(Email)),
+    HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
+	case db:qexists("select * from user where email =? and password=?",[Email,HashedPassword]) of
+		true -> wf:user(Email); %% we have a match, set session
+		false -> {error, "Email and Password do not match"}
 	end.
 
-register(Usr,Password,SecretAnswer) ->
-	Exists = db:qexists("select user from players where user=?",[Usr]),
-	if 
-		Exists -> {error, "Name Exists"}; %% it already exists, error
-		true -> db:qi("insert into players(user,password,SecretQuestionAnswer) values(?,?,?)",[Usr,Password,SecretAnswer]) 
+register(Email,Password,SecretAnswer) ->
+	Salt = mochihex:to_hex(erlang:md5(Email)),
+	HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
+	HashedAnswer = mochihex:to_hex(erlang:md5(Salt ++ SecretAnswer)),
+	case db:qexists("select email from user where email=?",[Email]) of
+		true -> {error, "Name Exists"}; %% it already exists, error
+		false -> db:qi("insert into user(email,password,SecretQuestionAnswer) values(?,?,?)",[Email,HashedPassword,HashedAnswer]) 
 	end.
 
-changePassword(Usr,Password,NewPassword) ->
-	Exists = db:qexists("select * from players where user =? and password=?",[Usr,Password]),
-	if
-		Exists -> db:q("update players SET password=? where user =?",[NewPassword,Usr]);
-		true -> {error, "Ooops, you may have made mistakes typing in your id or password. Please try again."}
+changePassword(Email,Password,NewPassword) ->
+	Salt = mochihex:to_hex(erlang:md5(Email)),
+	HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
+	HashedNewPassword = mochihex:to_hex(erlang:md5(Salt ++ NewPassword)),
+	case db:qexists("select * from user where email =? and password=?",[Email,HashedPassword]) of
+		true -> db:q("update user SET password=? where email =?",[HashedNewPassword,Email]);
+		false -> {error, "Ooops, you may have made mistakes typing in your id or password. Please try again."}
 	end.
 
-resetPassword(Usr, Password, Answer) ->
-	Exists = db:qexists("select * from players where user=? and SecretQuestionAnswer=?",[Usr,Answer]),
-	if
-		Exists -> db:q("update players SET password=? where user =?",[Password,Usr]);
-		true -> {error, "User name does not exist or you typed wrong security question answer."}
+random_string(Len) ->
+    Chrs = list_to_tuple("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"),
+    F = fun(_, R) -> [element(random:uniform(size(Chrs)), Chrs) | R] end,
+    lists:foldl(F, "", lists:seq(1, Len)).
+
+resetPassword(Email, Answer) ->
+	Salt = mochihex:to_hex(erlang:md5(Email)),
+	NewRandomPassword = random_string(10),
+	HashedNewPassword = mochihex:to_hex(erlang:md5(Salt ++ NewRandomPassword)),
+	HashedAnswer = mochihex:to_hex(erlang:md5(Salt ++ Answer)),
+	case db:qexists("select * from user where email=? and SecretQuestionAnswer=?",[Email,HashedAnswer]) of
+		true -> db:q("update user SET password=? where email =?",[HashedNewPassword,Email]),
+				{success, NewRandomPassword};
+		false -> {error, "User name does not exist or you typed wrong security question answer."}
 	end.

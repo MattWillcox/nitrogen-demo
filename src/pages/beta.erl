@@ -95,15 +95,13 @@ Body = [
 
 
 event(login) ->
-        Usr = wf:q(idTextbox),
+        Email = wf:q(idTextbox),
         Password = wf:q(pwTextbox),
-        Salt = mochihex:to_hex(erlang:md5(Usr)),
-        HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
-        case usr:login(Usr,HashedPassword) of
+        case usr:login(Email,Password) of
             {error, Reason} -> wf:wire(#alert{text=Reason});
             ok -> 
-                wf:user(Usr),
-                wf:set(currentUser, Usr),
+                wf:user(Email),
+                wf:set(currentUser, Email),
                 wf:redirect("/beta")
             end;
 
