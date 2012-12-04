@@ -11,3 +11,50 @@ th, td {
     overflow: hidden;
     width: 100px;
 }
+
+span {
+	font-size: 12px;
+}
+
+label {
+	font-size: 12px;
+}
+
+#reglink { font-size: 12px;
+
+}
+.chat_Users {
+	height : 325px;
+	overflow: auto;
+	border: solid 1px black;
+	background-color: ;
+	margin-top: 50px;
+}
+
+.chat_history {
+width: 95%;
+height: 400px;
+overflow: scroll;
+background-color: white;
+border: solid 1px black;
+padding: 12px;
+font-size: 110%;
+word-wrap: break-word;
+}
+
+.chat_history span{
+margin: 0;
+padding: 0;
+border: 0;
+outline: 0;
+font-size: 90%;
+vertical-align: baseline;
+background: transparent;
+
+}
+.chat_history p{
+font-size: .5em;
+line-height: 1em;
+margin: 0em 0em;
+
+}

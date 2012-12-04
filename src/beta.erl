@@ -25,13 +25,14 @@ Body = [
             #tablecell { align=center, body=#link { text="Leaderboard", url = "/leaderboard" }},
             #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
             #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
-            #tablecell { align=center, body=#link { text="Chat", url = "/beta" }},
-            #tablecell { align=center, body=#link { text="Logout", postback = logout}}
-        ]}]},
-        #panel { style = "text-align:right;", body = [#span{ text = "Currently logged in as: "},
-        #span { id = currentUser, text = Usr}]},
-
+            #tablecell { align=center, body=#link { text="Chat", url = "/chat" }},
+            #tablecell { align=center, body=#link { text="Logout", postback = logout }}
+            ]},
         #grid_clear{},
+        #grid_12 { body = [
+            #panel { style = "text-align:right;", body = [#span{ text = "Currently logged in as: "},
+            #span { id = currentUser, text  = CurrentUseir}]}]},
+        #grid_clear{},    
         #grid_4 { style = "font-size: small;", alpha= true, omega = true, body = [
         #image { style = "width: 90%", image = "/images/logo.jpg"},
         
@@ -86,8 +87,6 @@ Body = [
         }
     ]}
     ],
-
-
 
     Body.
 
