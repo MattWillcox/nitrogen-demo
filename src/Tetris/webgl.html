@@ -26,8 +26,15 @@
 
 
 <td> 
-<canvas id="canvas" style="border: none;" width="800" height="600">
+<!--Declare these in Nitrogen to avoid empty canvas taking up space-->
+<canvas id="canvas" style="border: solid;" width="320" height="600">
+</canvas>
+<canvas id="canvas2" style="border: solid;" width="160" height="250">
 Your browser does not support the canvas element.
+</canvas>
+<canvas id="canvas3" style="border: solid;" width="160" height="250">
+</canvas>
+<canvas id="canvas4" style="border: solid;" width="160" height="250">
 </canvas>
 </td> 
 
@@ -74,8 +81,23 @@ Your browser does not support the canvas element.
 
 
 <script type="text/javascript">
+    var GameMode = 4; //singleplayer = 1 Multiplayer = 2
+/*
+    function initGame(TheGameMode){ 
+//These were the single canvas approach of Multiplayer game board setup
+	if(TheGameMode == 1){
+		document.getElementById("canvas").width = 320;
+	}else if(TheGameMode == 2){
+		document.getElementById("canvas").width = 800;
+	}else if(TheGameMode == 3){
+		document.getElementById("canvas").width = 1200;
+	}else{
+		document.getElementById("canvas").width = 1600;
+	}
+    }
+*/
+
     var canvasWidth = 320;
-    var GameMode = 2; //singleplayer = 1 Multiplayer = 2
     var gl;
     var drawInterval;
     var canvas = document.getElementById("canvas");
@@ -302,7 +324,8 @@ Your browser does not support the canvas element.
 
             mat4.identity(mvMatrix);
 
-            var vx = -1.25 - 0.125 - 2.2;
+            //var vx = -1.25 - 0.125 - 2.2;
+	    var vx = -1.25 - 0.125;
             var vy = 2.75 + 0.25;
             //var d = 0.3;
             var d = 0.3;
@@ -337,11 +360,11 @@ Your browser does not support the canvas element.
             mvPopMatrix();
             ////////////////////////////////////////////2nd Board Below
 
-        }
+       }
     }
 
     function DrawOutline(color2) {
-        if (GameMode == 1) {
+        //if (GameMode == 1) {
             gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
 
             vertices2 = [
@@ -476,7 +499,7 @@ Your browser does not support the canvas element.
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer2.numItems);
 
             mvPopMatrix();
-        } else { //if Multiplayer
+        /*} else { //if Multiplayer //These were the single canvas approach of Multiplayer game board setup
             gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
 
             vertices2 = [
@@ -749,16 +772,17 @@ Your browser does not support the canvas element.
 
             mvPopMatrix();
 
-        }
+
+        }*///These were the single canvas approach of Multiplayer game board setup
 
     }
 
-    function draw() {
-
+    function draw(GameMode) {
+	if(GameMode > 0){
 	initGL(canvas);
         initShaders();
         initBuffers();
-        gl.clearColor(1.0, 0.0, 0.0, 1.0);
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -782,6 +806,11 @@ Your browser does not support the canvas element.
 	    num2 = Math.random();
 	    num3 = Math.random();
 	    newcolor = 0;
+	if(num1 == num2){
+		if(num2 == num3){
+			num3 = 0.5;
+		}
+	}else{}
 
 	}
 	for (var x = 0; x < 4; x++) {
@@ -801,6 +830,40 @@ Your browser does not support the canvas element.
 		var nameGiven = prompt("Please enter your name");
 		$.post("addScore.php", { name: nameGiven, score: engine.getScore(), auth: document.cookie});
 	}
+	}//GameMode Flag
+	if(GameMode > 1){
+	initGL(canvas2);
+        initShaders();
+        initBuffers();
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    ////////////////////////////////////////////////////////////////////
+        DrawOutline([0.0, 0.5, 1.0, 1.0]);
+	}	
+if(GameMode > 2){
+	initGL(canvas3);
+        initShaders();
+        initBuffers();
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    ////////////////////////////////////////////////////////////////////
+        DrawOutline([0.0, 0.5, 1.0, 1.0]);
+	}	
+if(GameMode > 3){
+	initGL(canvas4);
+        initShaders();
+        initBuffers();
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    ////////////////////////////////////////////////////////////////////
+        DrawOutline([0.0, 0.5, 1.0, 1.0]);
+	}	
     }
 
 
@@ -811,7 +874,7 @@ function keyboardFunc(e) {
 			engine.rotatePiece();
 			break;
 	    case 40: // down
-	        newcolor = 1;
+	                newcolor = 1;
 			engine.moveDown();
 			break;
 		case 37: // left
@@ -824,9 +887,11 @@ function keyboardFunc(e) {
 }
  
 window.addEventListener('keydown', keyboardFunc, true);
- 
+
+//initGame(GameMode); //These were the single canvas approach of Multiplayer game board setup
 engine.start();
-drawInterval = setInterval("draw()", 20);
+drawInterval = setInterval("draw(GameMode)", 20);
+//drawInterval = setInterval("draw()", 20); 
 
 
 

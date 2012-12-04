@@ -1,9 +1,3 @@
-/**
- * @authors:
- * Michal Ciebiada
- * Filip Kufrej
- */
-
 pieces = [
         [ 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -14,7 +8,7 @@ pieces = [
 		[ 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 ] ];
 
 function Engine() {
-    var colide = false;
+        var colide = false;	// indicates when a new series of line complete is happening
 	this.width = 10;	// width of the board (in squares)
 	this.height = 20;	// height of the board
 	this.board = [];	// fallen pieces (accessing: y * width + x)
