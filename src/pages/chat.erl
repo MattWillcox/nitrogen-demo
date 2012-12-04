@@ -7,7 +7,7 @@
 main() -> 
 	case wf:user() /= undefined of
 		true -> main_authorized();
-		false -> wf:redirect_to_login("/beta")
+		false -> wf:redirect_to_login("/register")
 	end.
 	
 
@@ -35,10 +35,9 @@ body() ->
     ]}.
 inner_body() -> 
 	wf:comet_global(fun() -> chat_loop() end, chatroom),
-	CurrentUser = wf:user(),
     [
         #span { text="Your chatroom name: " }, 
-        #span {style = "font-weight: bold;", text = CurrentUser},
+        #textbox { id=userNameTextBox, text="Anonymous", style="width: 100px;", next=messageTextBox },
         #panel { id=chatHistory, class=chat_history },
 
         #p{},
@@ -49,7 +48,7 @@ inner_body() ->
 
 event(chat) ->
 
-    Username = wf:user(),
+    Username = wf:q(userNameTextBox),
     Message = wf:q(messageTextBox),
     wf:send_global(chatroom, {message, Username, Message}),
     wf:wire("obj('messageTextBox').focus(); obj('messageTextBox').select();");
