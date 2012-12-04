@@ -7,7 +7,7 @@
 main() -> 
 	case wf:user() /= undefined of
 		true -> main_authorized();
-		false -> wf:redirect_to_login("/login")
+		false -> wf:redirect_to_login("/beta")
 	end.
 	
 
@@ -29,7 +29,9 @@ body() ->
             #tablecell { align=center, body=#link { text="Logout", postback = logout }}
         ]}]},
         #grid_clear{},
-        #grid_12 { alpha=true, prefix=2, suffix=2, omega=true, body=inner_body() }
+        #grid_4 {alpha=true, body = [#image { style = "width: 90%; margin-top: 34px", 
+        image = "/images/logo.jpg"}] },
+        #grid_8 {omega=true, body=inner_body() }
     ]}.
 inner_body() -> 
 	wf:comet_global(fun() -> chat_loop() end, chatroom),
@@ -37,12 +39,11 @@ inner_body() ->
     [
         #span { text="Your chatroom name: " }, 
         #span {style = "font-weight: bold;", text = CurrentUser},
-        #p{},
         #panel { id=chatHistory, class=chat_history },
 
         #p{},
-        #textbox { id=messageTextBox, style="width: 500;", next=sendButton },
-        #button { id=sendButton, text="Send", postback=chat }
+        #textbox { id=messageTextBox, style="width: 350px; height: 20px; word-wrap: break-word;", next=sendButton },
+        #button { id=sendButton, style="width: 75px; margin-left: 10px;", text="Send", postback=chat }
     ].
 		
 

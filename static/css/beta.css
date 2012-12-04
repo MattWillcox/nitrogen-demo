@@ -23,15 +23,23 @@ label {
 #reglink { font-size: 12px;
 
 }
+.chat_Users {
+	height : 325px;
+	overflow: auto;
+	border: solid 1px black;
+	background-color: ;
+	margin-top: 50px;
+}
 
 .chat_history {
-width: 50%;
-height: 300px;
-overflow: auto;
+width: 95%;
+height: 400px;
+overflow: scroll;
 background-color: white;
 border: solid 1px black;
 padding: 12px;
 font-size: 110%;
+word-wrap: break-word;
 }
 
 .chat_history span{
