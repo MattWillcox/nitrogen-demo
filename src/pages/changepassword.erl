@@ -3,7 +3,7 @@
 -compile(export_all).
 -include_lib("nitrogen_core/include/wf.hrl").
 
-main() -> #template { file="./site/templates/main.html" }.
+main() -> #template { file="./site/templates/beta.html" }.
 
 title() -> "href Tetris".
 
