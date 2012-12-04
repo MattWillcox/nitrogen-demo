@@ -11,10 +11,10 @@ title() -> "Hello from beta.erl!".
 
 body() -> 
 
-User = case wf:user() of
-undef -> "Guest";
-Other -> Other
-end,
+Usr = case wf:user() of
+    undefined -> "Guest";
+    Other -> Other
+    end,
 
 Body = [
 
@@ -22,14 +22,14 @@ Body = [
         #grid_12 { style = "border: 10px solid grey; text-align: center;", body = [ 
                 #singlerow {style="width: 920px;", cells=[
             #tablecell { align=center, body=#link { text="Home", url = "/beta" }},
-            #tablecell { align=center, body=#link { text="Leaderboard", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Leaderboard", url = "/leaderboard" }},
             #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
             #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
             #tablecell { align=center, body=#link { text="Chat", url = "/beta" }},
-            #tablecell { align=center, body=#link { text="Logout", url = "/beta" }}
+            #tablecell { align=center, body=#link { text="Logout", postback = logout}}
         ]}]},
         #panel { style = "text-align:right;", body = [#span{ text = "Currently logged in as: "},
-                        #span { id = currentUser, text = User}]},
+        #span { id = currentUser, text = Usr}]},
 
         #grid_clear{},
         #grid_4 { style = "font-size: small;", alpha= true, omega = true, body = [
@@ -37,10 +37,11 @@ Body = [
         
         [
         "Instructions:
-        Create an account to the right of the game screen.
-        Once you are logged in, hit start to beging searching
-        for an opponent. Your statistics are stored under the
+        Login to start searching for an opponent.
+        Your statistics are stored under the
         'Profile' link at the top. 
+        If you do not have account yet,
+        create an account to the right of the game screen.
         <p>
         Controls:
         Use the arrows keys to move the pieces. 
@@ -53,62 +54,60 @@ Body = [
         ]},
         #grid_4 { id = game1, style = "border: 10px solid black; color: white; 
         background-color: black; padding-bottom:470px;", body = "GAME HERE?"},
-        #grid_4 { id = game2, body = [
-        #label { id = label1, class=temp, text="User Name" },
-        #textbox { id=nameTextBox, next=emailTextBox },
-
-        #label { id = label2, class=temp, text="Email Address" },
-        #textbox { id=emailTextBox, next=passwordTextBox },
-
-        #label { id = label3, class=temp, text="Password" },
-        #password { id=passwordTextBox, next=confirmTextBox },
-
-        #label { id = label4, class=temp, text="Confirm" },
-        #password { id=confirmTextBox, next=continueButton },
-        #br{},
-        #button { id=continueButton, text="Continue", postback=continue } ]}
+        #grid_4 {
+            id = game2,
+            show_if = (wf:user() == undefined),
+            body = [
+                #panel{
+                    class=loginboxWrapper,
+                    id=loginbox,
+                    body=[
+                        #label{id=label1, text="Email"},
+                        #textbox{ id=idTextbox, class=idTextbox, next=pwTextbox},
+                        #label{id=label2, text="Password"},
+                        #password{ id=pwTextbox, class=pwTextbox, next=loginButton},
+                        #br{},
+                        #button{id=loginButton, text="Login", postback=login},
+                        #p{},
+                        #link {id=createAccountLink, text = "Don't have account yet?", url = "/register"},
+                        #br{},
+                        " or ",
+                        #link {id=forgotPasswordLink, text = "Forgot password?", url = "/password"},
+                        #p{}
+                    ]
+                }
+            ]
+        },
+        #grid_4 {
+            id = game2_2,
+            show_if = (wf:user() /= undefined),
+            body = [#panel{style="border: 10px solid black; color: white; 
+                    background-color: black; padding-bottom:470px;", body = "Searching for Opponent"}]
+        }
     ]}
     ],
 
-    wf:wire(continueButton, nameTextBox, #validate { validators=[
-        #is_required { text="Required." }
-    ]}),
 
-    wf:wire(continueButton, emailTextBox, #validate { validators=[
-        #is_required { text="Required." },
-        #is_email { text="Enter a valid email address." }
-    ]}),
-
-    wf:wire(continueButton, passwordTextBox, #validate { validators=[
-        #is_required { text="Required." },
-        #min_length { length=6, text="Password must be at least 6 characters long." }
-    ]}),
-
-    wf:wire(continueButton, confirmTextBox, #validate { validators=[
-        #is_required { text="Required." },
-        #confirm_password { password=passwordTextBox, text="Passwords must match." }
-    ]}),  
 
     Body.
 
 
-event(continue) ->
-        User = wf:q(nameTextBox),
-        wf:user(User),
-        Name = wf:q(nameTextBox),
-        Message = wf:f("Welcome ~s! Your information is valid.", [Name]),
-        wf:set(currentUser, User),
-        wf:replace(game2, #grid_4 {style="border: 10px solid black; color: white; 
-            background-color: black; padding-bottom:470px;", body = "Searching for Opponent"}),
-        wf:flash(Message),
-        wf:remove(nameTextBox),
-        wf:remove(emailTextBox),
-        wf:remove(passwordTextBox),
-        wf:remove(confirmTextBox),
-        wf:remove(continueButton),
-        wf:remove(label1),
-        wf:remove(label2),
-        wf:remove(label3),
-        wf:remove(label4);
+event(login) ->
+        Usr = wf:q(idTextbox),
+        Password = wf:q(pwTextbox),
+        Salt = mochihex:to_hex(erlang:md5(Usr)),
+        HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
+        case usr:login(Usr,HashedPassword) of
+            {error, Reason} -> wf:wire(#alert{text=Reason});
+            ok -> 
+                wf:user(Usr),
+                wf:set(currentUser, Usr),
+                wf:redirect("/beta")
+            end;
+
+event(logout) ->
+    wf:user("Guest"),
+    wf:clear_session(),
+    wf:redirect("/beta");
 
 event(_) -> ok.
