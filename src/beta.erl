@@ -25,13 +25,15 @@ Body = [
             #tablecell { align=center, body=#link { text="Leaderboard", url = "/beta" }},
             #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
             #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
-            #tablecell { align=center, body=#link { text="Chat", url = "/beta" }},
-            #tablecell { align=center, body=#link { text="Logout", url = "/beta" }}
-        ]}]},
-        #panel { style = "text-align:right;", body = [#span{ text = "Currently logged in as: "},
-                        #span { id = currentUser, text = CurrentUser}]},
-
+            #tablecell { align=center, body=#link { text="Chat", url = "/chat" }},
+            #tablecell { align=center, body=#link { text="Logout", postback = logout }}
+            ]}
+            ]},
         #grid_clear{},
+        #grid_12 { body = [
+            #panel { style = "text-align:right;", body = [#span{ text = "Currently logged in as: "},
+            #span { id = currentUser, text  = CurrentUser}]}]},
+        #grid_clear{},    
         #grid_4 { style = "font-size: small;", alpha= true, omega = true, body = [
         #image { style = "width: 90%", image = "/images/logo.jpg"},
         
@@ -55,28 +57,18 @@ Body = [
         background-color: black; padding-bottom:470px;", body = "GAME HERE?"},
         #grid_4 { id = game2, body = [
         #label { id = label1, class=temp, text="User Name" },
-        #textbox { id=nameTextBox, next=emailTextBox },
-
-        #label { id = label2, class=temp, text="Email Address" },
-        #textbox { id=emailTextBox, next=passwordTextBox },
+        #textbox { id=nameTextBox, next=passwordTextBox },
 
         #label { id = label3, class=temp, text="Password" },
-        #password { id=passwordTextBox, next=confirmTextBox },
-
-        #label { id = label4, class=temp, text="Confirm" },
-        #password { id=confirmTextBox, next=continueButton },
+        #password { id=passwordTextBox, next=confirmButton },
         #br{},
-        #button { id=continueButton, text="Continue", postback=continue } ]}
-    ]}
-    ],
+        #button { id=continueButton, text="Continue", postback=continue },
+        #br{},
+        #link { id=regLink, text = "New player? Register here.", url = "/register"} ]}
+    ]}], 
 
     wf:wire(continueButton, nameTextBox, #validate { validators=[
         #is_required { text="Required." }
-    ]}),
-
-    wf:wire(continueButton, emailTextBox, #validate { validators=[
-        #is_required { text="Required." },
-        #is_email { text="Enter a valid email address." }
     ]}),
 
     wf:wire(continueButton, passwordTextBox, #validate { validators=[
@@ -84,13 +76,7 @@ Body = [
         #min_length { length=6, text="Password must be at least 6 characters long." }
     ]}),
 
-    wf:wire(continueButton, confirmTextBox, #validate { validators=[
-        #is_required { text="Required." },
-        #confirm_password { password=passwordTextBox, text="Passwords must match." }
-    ]}),  
-
-    Body.
-
+Body.
 
 event(continue) ->
         User = wf:q(nameTextBox),
@@ -103,14 +89,18 @@ event(continue) ->
             wf:replace(game2, #grid_4 { body = [#span{ text = "Search for opponent"},
                                                 #br{},
                                                 #button { id=searchButton, text="Search" }]}),
-            wf:remove(nameTextBox),
-            wf:remove(emailTextBox),
-            wf:remove(passwordTextBox),
-            wf:remove(confirmTextBox),
-            wf:remove(continueButton),
-            wf:remove(label1),
-            wf:remove(label2),
-            wf:remove(label3),
-            wf:remove(label4);
+            wf:wire(nameTextBox, #hide{}),
+            wf:wire(passwordTextBox, #hide{}),
+            wf:wire(confirmTextBox, #hide{}),
+            wf:wire(continueButton, #hide{}),
+            wf:wire(label1, #hide{}),
+            wf:wire(label3, #hide{}),
+            wf:wire(regLink, #hide{});
+
+event(logout) ->
+    wf:delete_cookie(pastUser),
+    wf:user("Guest"),
+    wf:clear_session(),
+    wf:redirect("/beta");
 
 event(_) -> ok.

@@ -19,19 +19,29 @@ headline() -> "Chat Room - Comet".
 
 body() -> 
 	#container_12 { body=[
-        #grid_8 { alpha=true, prefix=2, suffix=2, omega=true, body=inner_body() }
+        #grid_12 { style = "border: 10px solid grey; text-align: center;", body = [ 
+                #singlerow {style="width: 920px;", cells=[
+            #tablecell { align=center, body=#link { text="Home", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Leaderboard", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
+            #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Chat", url = "/chat" }},
+            #tablecell { align=center, body=#link { text="Logout", postback = logout }}
+        ]}]},
+        #grid_clear{},
+        #grid_12 { alpha=true, prefix=2, suffix=2, omega=true, body=inner_body() }
     ]}.
 inner_body() -> 
 	wf:comet_global(fun() -> chat_loop() end, chatroom),
 	CurrentUser = wf:user(),
     [
         #span { text="Your chatroom name: " }, 
-	#span {style = "font-weight: bold;", text = CurrentUser},
+        #span {style = "font-weight: bold;", text = CurrentUser},
         #p{},
         #panel { id=chatHistory, class=chat_history },
 
         #p{},
-        #textbox { id=messageTextBox, style="width: 40;", next=sendButton },
+        #textbox { id=messageTextBox, style="width: 500;", next=sendButton },
         #button { id=sendButton, text="Send", postback=chat }
     ].
 		
@@ -48,11 +58,6 @@ event(_) -> ok.
 chat_loop() ->
     receive 
         'INIT' ->
-            Terms = [
-                #p{},
-                #span { text="You are the only person in the chat room.", class=message }
-            ],
-            wf:insert_bottom(chatHistory, Terms),
             wf:flush();
 
         {message, Username, Message} ->
