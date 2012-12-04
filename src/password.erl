@@ -14,20 +14,40 @@ body() ->
 	        body=[
 	        #h1 {text = "Password Reset (not implemented!)"},
 	        #label {text = "Please enter your Email address"},
-	        #textbox { id=idTextbox, class=idTextbox, text=""},
+	        #textbox { id=idTextbox, class=idTextbox, text="", next = resetPassword},
 	        #p{},
 	        
 	        #button { id=resetPassword, text = "Reset Password", postback=reset},
-	        #br{}
+	        #br{},
+			#flash{},
+	        #link { id=linkToMain, text="Back to main page", postback=toMain }
 	        ]
-	    },
-	    #flash{}
+	    }
+
     ].
 
+random_string(Len) ->
+    Chrs = list_to_tuple("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"),
+    F = fun(_, R) -> [element(random:uniform(size(Chrs)), Chrs) | R] end,
+    lists:foldl(F, "", lists:seq(1, Len)).
+
 event(reset) ->
-    wf:wire(registerButton, #hide{} ),
-    wf:flash( "Your password has been reset!" ),
-    timer:sleep(1000),
+	Usr = wf:q(idTextbox),
+	Salt = mochihex:to_hex(erlang:md5(Usr)),
+	NewRandomPassword = random_string(10),
+	HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ NewRandomPassword)),
+
+    case usr:resetPassword(Usr,HashedPassword) of
+		{error, Reason} -> wf:wire(#alert{text=Reason});
+		ID when is_integer(ID) -> 
+		    wf:wire(resetPassword, #hide{} ),
+		    wf:wire(linkToMain, #show{} ),
+		    Message = "Your password has been reset! Your new password is :" ++ NewRandomPassword,
+		    wf:flash( Message )
+	end;
+
+
+event(toMain) ->
     wf:redirect("/main");
 
 event(_) -> ok.
