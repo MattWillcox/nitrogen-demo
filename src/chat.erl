@@ -7,7 +7,7 @@
 main() -> 
 	case wf:user() /= undefined of
 		true -> main_authorized();
-		false -> wf:redirect_to_login("/beta")
+		false -> wf:redirect_to_login("/register")
 	end.
 	
 
