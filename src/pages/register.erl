@@ -70,14 +70,11 @@ body() ->
 
 
 event(register) ->
-	Usr = wf:q(idTextbox),
+	Email = wf:q(idTextbox),
 	Password = wf:q(pwTextbox),
 	SecretAnswer = wf:q(secretAnswerTextbox),
-	Salt = mochihex:to_hex(erlang:md5(Usr)),
-	HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
-	HashedAnswer = mochihex:to_hex(erlang:md5(Salt ++ SecretAnswer)),
 
-	case usr:register(Usr,HashedPassword,HashedAnswer) of
+	case usr:register(Email,Password,SecretAnswer) of
 		{error, Reason} -> wf:wire(#alert{text=Reason});
 		ID when is_integer(ID) -> 
 			wf:wire(#alert{text="Registered! Please Log In"}),
