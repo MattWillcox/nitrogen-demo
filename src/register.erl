@@ -28,11 +28,14 @@ body() ->
 	        body=[
 	        #h1 {text = "Create New Account"},
 	        #label {text = "Please enter your Email address"},
-	        #textbox { id=idTextbox, class=idTextbox, text=""},
+	        #textbox { id=idTextbox, class=idTextbox, text="", next=pwTextbox},
 	        #label {text= "Please enter new password"},
-	        #password { id=pwTextbox, class=pwTextbox, text=""},
+	        #password { id=pwTextbox, class=pwTextbox, text="", next=pwConfirmTextbox},
 	        #label {text= "Please enter password again to confirm"},
-	        #password { id=pwConfirmTextbox, class=pwConfirmTextbox, text=""},
+	        #password { id=pwConfirmTextbox, class=pwConfirmTextbox, text="", next=secretAnswerTextbox},
+	        #br{},
+	        #label {text= "Security Question: When is your birthday (yyyyMMdd)? This will be used to reset your password."},
+	        #textbox { id=secretAnswerTextbox, class=secretAnswerTextbox, text="", next=registerButton},
 	        #br{},
 	        #button { id=registerButton, text = "Create New Account", postback=register},
 	        #br{}
@@ -44,11 +47,14 @@ body() ->
 event(register) ->
 	Usr = wf:q(idTextbox),
 	Password = wf:q(pwTextbox),
+	SecretAnswer = wf:q(secretAnswerTextbox),
 	Salt = mochihex:to_hex(erlang:md5(Usr)),
 	HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
-	case usr:register(Usr,HashedPassword) of
+	HashedAnswer = mochihex:to_hex(erlang:md5(Salt ++ SecretAnswer)),
+
+	case usr:register(Usr,HashedPassword,HashedAnswer) of
 		{error, Reason} -> wf:wire(#alert{text=Reason});
 		ID when is_integer(ID) -> 
 			wf:wire(#alert{text="Registered! Please Log In"}),
-			wf:redirect("/main")
+			wf:redirect("/beta")
 	end.

@@ -14,9 +14,10 @@ body() ->
 	        body=[
 	        #h1 {text = "Password Reset (not implemented!)"},
 	        #label {text = "Please enter your Email address"},
-	        #textbox { id=idTextbox, class=idTextbox, text="", next = resetPassword},
-	        #p{},
-	        
+	        #textbox { id=idTextbox, class=idTextbox, text="", next = secretAnswerTextbox},
+	        #br{},
+	        #label {text= "Security Question: When is your birthday (yyyyMMdd)?"},
+	        #textbox { id=secretAnswerTextbox, text="", next=resetButton},
 	        #button { id=resetPassword, text = "Reset Password", postback=reset},
 	        #br{},
 			#flash{},
@@ -33,11 +34,13 @@ random_string(Len) ->
 
 event(reset) ->
 	Usr = wf:q(idTextbox),
+	Answer = wf:q(secretAnswerTextbox),
 	Salt = mochihex:to_hex(erlang:md5(Usr)),
 	NewRandomPassword = random_string(10),
 	HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ NewRandomPassword)),
+	HashedAnswer = mochihex:to_hex(erlang:md5(Salt ++ Answer)),
 
-    case usr:resetPassword(Usr,HashedPassword) of
+    case usr:resetPassword(Usr,HashedPassword,HashedAnswer) of
 		{error, Reason} -> wf:wire(#alert{text=Reason});
 		ID when is_integer(ID) -> 
 		    wf:wire(resetPassword, #hide{} ),
