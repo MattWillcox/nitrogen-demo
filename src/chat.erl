@@ -7,11 +7,11 @@
 main() -> 
 	case wf:user() /= undefined of
 		true -> main_authorized();
-		false -> wf:redirect_to_login("/register")
+		false -> wf:redirect_to_login("/tetrislogin")
 	end.
 	
 
-main_authorized() -> #template { file="./site/templates/chat.html" }.
+main_authorized() -> #template { file="./site/templates/beta.html" }.
 
 
 title() -> "Chat Room".
