@@ -47,3 +47,15 @@ resetPassword(Email, Answer) ->
 				{success, NewRandomPassword};
 		false -> {error, "User name does not exist or you typed wrong security question answer."}
 	end.
+
+updateVisit(Email) ->
+	db:q("update user set lastivist=now() where email =?",[Email]).
+
+friendsOnline(Email) ->
+	db:q("select friend.user2 from user join friend on friend.user1 =? where unix_timestamp(lastvisit) > (unix_timestamp() - 60*10);",[Email]).
+
+
+
+
+
+
