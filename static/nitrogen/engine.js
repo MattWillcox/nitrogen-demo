@@ -86,7 +86,12 @@ function Engine() {
 	this.getLinesCompleted = function() {
 		return this.linesCompleted;
 	};
-	
+	this.getBoard3 = function() {
+		return this.board;
+	};
+	this.getBoard2 = function(x) {
+		return this.board[x];
+	};
 	this.getBoard = function(x, y) {
 		return this.board[y * this.width + x];
 	};

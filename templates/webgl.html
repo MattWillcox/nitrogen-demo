@@ -22,7 +22,6 @@
 
 </head>
 
-
 <body>
 
 <table><tr> 
@@ -93,9 +92,12 @@ Your browser does not support the canvas element.
     }
 </script>
 
+[[[page:body()]]]
 
-<script type="text/javascript">
-    var GameMode = 4; //singleplayer = 1 Multiplayer = 2
+<script>
+[[[script]]]
+
+//var GameMode = 4; //singleplayer = 1 Multiplayer = 2
 
     function initGame(TheGameMode){ 
 //These were the single canvas approach of Multiplayer game board setup
@@ -113,13 +115,86 @@ Your browser does not support the canvas element.
 	}
     }
 
+	var Testing;
+	var Testing2;
+	var GameID =  "AAAA";//This Game's ID, 1~100 when Game Started, send to other player
+	var GameID2 = "BBBB";//2nd player's Game ID.
+	var GameID3 = "CCCC";
+	var GameID4 = "DDDD";
+//Boards Infos
+	var GameBoard  = new Array(200); //My Board Info
+	var GameBoard2 = new Array(200); //2nd player's board info (accessing: y * width + x)
+	var GameBoard3 = new Array(200); //3rd player's board info  width = 10 height = 20;
+	var GameBoard4 = new Array(200); //4th player's board info
+//Boards Infos
+//Current Piece Infos
+	var GamePiece = new Array(18);  //My Piece Info
+	var GamePiece2 = new Array(18); //2nd player's piece info (acessing: y * 4 + x) 4*4 array
+	var GamePiece3 = new Array(18); //3rd player's piece info [16][17] 
+	var GamePiece4 = new Array(18); //4th player's piece info (i.e. Last 2 entries are X & Y coordinates)
+//Current Piece Infos
+//////////////////////////////////////////////////Use DB instead of this for project
+//////////////////////////////////////////////////A way to give ID to players without DB
+	function GetGameID(GameMode){
+	var flag = false;
 
+	var randomnumber;
+		do {
+			if(TheGameMode == 1){
+				flag = true;
+				GameID = "MyGame";
+			}else if(TheGameMode == 2){
+				randomnumber=Math.floor(Math.random()*100)+1;
+				GameID = randomnumber.toString();
+				//comet
+				//page.testAPI(GameID);
+				//comet
+				if(GameID != GameID2){
+					flag = true;
+				}
+			}else if(TheGameMode == 3){
+				randomnumber=Math.floor(Math.random()*100)+1;
+				GameID = randomnumber.toString();
+				//comet
+				//comet
+				if(GameID != GameID2){
+				if(GameID != GameID3){
+				if(GameID2 != GameID3){
+					flag = true;
+				}
+				}
+				}		
+			}else{
+				randomnumber=Math.floor(Math.random()*100)+1;
+				GameID = randomnumber.toString();
+				//comet
+				//comet
+				if(GameID != GameID2){
+				if(GameID != GameID3){
+				if(GameID != GameID4){
+				if(GameID2 != GameID3){
+				if(GameI2 != GameID4){
+				if(GameID3 != GameID4){
+					flag = true;
+				}
+				}
+				}
+				}
+				}
+				}
+			}
+		}
+		while (flag != true);
+    	}
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////	
     var canvasWidth = 320;
     var gl;
     var drawInterval;
     var canvas = document.getElementById("canvas");
     //var context = canvas.getContext("2d");
     var engine = new Engine();
+
 
     function initGL(canvas) {
 
@@ -297,7 +372,7 @@ Your browser does not support the canvas element.
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
     }
 
-    function drawScene(x, y, color) {
+    function drawScene(x, y, color, theGameMode, PlayerNumber) {
 	var layout = new Array();
 	if (GameMode == 1){
 		layout[0] = 0.0;
@@ -325,6 +400,7 @@ Your browser does not support the canvas element.
             //var d = 0.3;
             var d = 0.3;
 
+		
             mat4.translate(mvMatrix, [vx + x * d +layout[0], vy - y * d, -7.0]);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
@@ -528,7 +604,7 @@ Your browser does not support the canvas element.
     }
 
     function draw(GameMode) {
-	if(GameMode > 0){
+	
 	initGL(canvas);
         initShaders();
         initBuffers();
@@ -536,18 +612,36 @@ Your browser does not support the canvas element.
         gl.enable(gl.DEPTH_TEST);
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    ////////////////////////////////////////////////////////////////////
-        DrawOutline([0.7,0.5,1.0,1.0]);
+	
+	DrawOutline([0.7,0.5,1.0,1.0]);
+
+	//Send out Board Info Right Here
+	for (var i = 0; i < 200; i++){
+	    GameBoard[i] = engine.getBoard2(i); // Get all board information into an array
+	}
+	page.testAPI2(GameBoard); // Reference GameBoard in Nitrogen
+	//Receive other players' Board in Nitrogen
+	//////////////////////////////////////////
 
 	// draw board
-	for (var x = 0; x < engine.getWidth(); x++) {
-		// reset line (ruszyc pedzel ns poczatek wiersza)
-		for (var y = 0; y < engine.getHeight(); y++) {
-			// ruszyc pedzel w prawo
-			if (engine.getBoard(x, y) == 0) continue;
-			drawScene(x,y, [1.0,0.9,0.4,1.0]);
+
+		if (GameMode > 0){}
+		if (GameMode > 1){
+			if (GameMode == 2){}
+			else{}
 		}
-	}
+		if (GameMode > 2){}
+		if (GameMode > 3){}
+
+		
+		for (var x = 0; x < engine.getWidth(); x++) {
+			// reset line (ruszyc pedzel ns poczatek wiersza)
+			for (var y = 0; y < engine.getHeight(); y++) {
+				if (engine.getBoard(x, y) == 0) continue;
+				drawScene(x,y, [1.0,0.9,0.4,1.0],GameMode,1);
+			}
+		}
+
 
         // draw piece
 	if (newcolor == 1) {
@@ -563,13 +657,26 @@ Your browser does not support the canvas element.
 	}else{}
 
 	}
+
+		if (GameMode > 0){}
+		if (GameMode > 1){
+			if (GameMode == 2){}
+			else{}
+		}
+		if (GameMode > 2){}
+		if (GameMode > 3){}
+
+
+
+
 	for (var x = 0; x < 4; x++) {
 		for (var y = 0; y < 4; y++) {
 		    if (engine.getPiece(x, y) == 0) continue;
-		    drawScene(engine.getPieceX() + x, engine.getPieceY() + y, [num1, num2, num3, 1.0]);
+		    drawScene(engine.getPieceX() + x, engine.getPieceY() + y, [num1, num2, num3, 1.0],GameMode,1);
 		}
 	}
- 	
+
+	
 	document.getElementById("score").innerHTML = engine.getScore();
 	document.getElementById("level").innerHTML = engine.getLevel();
 	document.getElementById("co").innerHTML = engine.getlinesCompletedCount();
@@ -578,21 +685,8 @@ Your browser does not support the canvas element.
 	if (engine.isGameOver()) {
 		clearInterval(drawInterval);
 		var nameGiven = prompt("Please enter your name");
-		$.post("addScore.php", { name: nameGiven, score: engine.getScore(), auth: document.cookie});
+		//$.post("addScore.php", { name: nameGiven, score: engine.getScore(), auth: document.cookie});
 	}
-
-	}//GameMode Flag
-
-	if(GameMode > 1){
-
-	}	
-	if(GameMode > 2){
-	
-	}	
-	if(GameMode > 3){
-
-	}	
-
 
     }
 
@@ -629,16 +723,7 @@ engine.start();
 drawInterval = setInterval("draw(GameMode)", 20);
 AttackedInterval = setInterval("BeingAttacked(4)", 5000);//Test code
 //drawInterval = setInterval("draw()", 20); 
-
-
-
 </script>
-
-[[[page:body()]]]
-<script>
-[[[script]]]
-</script>
-
 </body>
 
 </html>
