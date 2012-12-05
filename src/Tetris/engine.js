@@ -1,9 +1,3 @@
-/**
- * @authors:
- * Michal Ciebiada
- * Filip Kufrej
- */
-
 pieces = [
         [ 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -14,7 +8,7 @@ pieces = [
 		[ 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 ] ];
 
 function Engine() {
-    var colide = false;
+        var colide = false;	// indicates when a new series of line complete is happening
 	this.width = 10;	// width of the board (in squares)
 	this.height = 20;	// height of the board
 	this.board = [];	// fallen pieces (accessing: y * width + x)
@@ -99,6 +93,26 @@ function Engine() {
 
 	this.getPiece = function(x, y) {
 		return this.piece[y * 4 + x];
+	};
+	this.Attacked = function(){
+		for (var y1 = 0; y1 < 20; y1++) {
+			for (var x = 0; x < this.width; x++) {
+				this.board[(y1) * this.width + x] = this.board[(y1+1) * this.width + x];
+			}
+		}
+		var theHole = Math.floor(Math.random()*10)+1;
+		for (var x = 0; x < this.width; x++) {
+			this.board[(this.height-1)*this.width + x]=0;
+			if (x == theHole){
+			//Leave a Hole			
+			}else{
+				this.board[(this.height-1)*this.width + x]=1;
+			}
+
+
+
+
+		}
 	};
 	
 	this.getNextPiece = function(x, y) {
