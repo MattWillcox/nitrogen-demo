@@ -1,0 +1,628 @@
+<html>
+
+<head>
+<title>HREF Tetris</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+
+
+
+</head>
+
+
+<body>
+
+
+<table><tr> 
+ 
+<td valign="top"> 
+<p>Score: <span id="score"></span></p> 
+<p>Level: <span id="level"></span></p> 
+<p>Lines completed once: <span id="co"></span></p> 
+<p>Lines completed: <span id="lines"></span></p> 
+ 
+<h2>Top 10 highscores</h2><table><tr><td>7014</td><td>OLA:*</td></tr><tr><td>6986</td><td>Neos</td></tr><tr><td>6310</td><td>:*</td></tr><tr><td>6306</td><td>Ola</td></tr><tr><td>6269</td><td>Neos</td></tr><tr><td>6080</td><td>Ola</td></tr><tr><td>5939</td><td>:*</td></tr><tr><td>5925</td><td>:)</td></tr><tr><td>5851</td><td>:)</td></tr><tr><td>5724</td><td>:)</td></tr></table></td>
+
+
+
+<td> 
+<!--Declare these in Nitrogen to avoid empty canvas taking up space-->
+<canvas id="canvas" style="border: solid;" width="320" height="600">
+Your browser does not support the canvas element.
+</canvas>
+<!--<canvas id="canvas2" style="border: solid;" width="160" height="250">
+Your browser does not support the canvas element.
+</canvas>
+<canvas id="canvas3" style="border: solid;" width="160" height="250">
+</canvas>
+<canvas id="canvas4" style="border: solid;" width="160" height="250">
+</canvas>-->
+</td> 
+
+
+<!--
+<td valign="top"> 
+<p>Score: <span id="score2"></span></p> 
+<p>Level: <span id="level2"></span></p> 
+<p>Lines completed: <span id="lines2"></span></p> 
+ 
+<h2>Top 10 highscores</h2><table><tr><td>7014</td><td>OLA:*</td></tr><tr><td>6986</td><td>Neos</td></tr><tr><td>6310</td><td>:*</td></tr><tr><td>6306</td><td>Ola</td></tr><tr><td>6269</td><td>Neos</td></tr><tr><td>6080</td><td>Ola</td></tr><tr><td>5939</td><td>:*</td></tr><tr><td>5925</td><td>:)</td></tr><tr><td>5851</td><td>:)</td></tr><tr><td>5724</td><td>:)</td></tr></table></td>-->
+  
+ 
+</tr></table> 
+<script type="text/javascript" src="jquery-1.5.2.min.js"></script> 
+<script type="text/javascript" src="engine.js"></script> 
+
+<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_FragColor = vColor;
+    }
+</script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vColor = aVertexColor;
+    }
+</script>
+
+
+<script type="text/javascript">
+    var GameMode = 4; //singleplayer = 1 Multiplayer = 2
+
+    function initGame(TheGameMode){ 
+//These were the single canvas approach of Multiplayer game board setup
+	if(TheGameMode == 1){
+		document.getElementById("canvas").width = 920;
+		//document.getElementById("canvas").width = 320;
+	}else if(TheGameMode == 2){
+		document.getElementById("canvas").width = 920;
+		//document.getElementById("canvas").width = 720;
+	}else if(TheGameMode == 3){
+		document.getElementById("canvas").width = 920;
+		//document.getElementById("canvas").width = 720;
+	}else{
+		document.getElementById("canvas").width = 920;
+	}
+    }
+
+
+    var canvasWidth = 320;
+    var gl;
+    var drawInterval;
+    var canvas = document.getElementById("canvas");
+    //var context = canvas.getContext("2d");
+    var engine = new Engine();
+
+    function initGL(canvas) {
+
+        var newcolor = 1;
+        try {
+            gl = canvas.getContext("experimental-webgl");
+            gl.viewportWidth = canvas.width;
+            gl.viewportHeight = canvas.height;
+        } catch (e) {
+        }
+        if (!gl) {
+            alert("Could not initialise WebGL, sorry :-(");
+        }
+    }
+
+
+    function getShader(gl, id) {
+        var shaderScript = document.getElementById(id);
+        if (!shaderScript) {
+            return null;
+        }
+
+        var str = "";
+        var k = shaderScript.firstChild;
+        while (k) {
+            if (k.nodeType == 3) {
+                str += k.textContent;
+            }
+            k = k.nextSibling;
+        }
+
+        var shader;
+        if (shaderScript.type == "x-shader/x-fragment") {
+            shader = gl.createShader(gl.FRAGMENT_SHADER);
+        } else if (shaderScript.type == "x-shader/x-vertex") {
+            shader = gl.createShader(gl.VERTEX_SHADER);
+        } else {
+            return null;
+        }
+
+        gl.shaderSource(shader, str);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            alert(gl.getShaderInfoLog(shader));
+            return null;
+        }
+
+        return shader;
+    }
+
+
+    var shaderProgram;
+
+    function initShaders() {
+        var fragmentShader = getShader(gl, "shader-fs");
+        var vertexShader = getShader(gl, "shader-vs");
+
+        shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            alert("Could not initialise shaders");
+        }
+
+        gl.useProgram(shaderProgram);
+
+        shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+        shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
+        gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
+        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+        shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+    }
+
+
+    var mvMatrix = mat4.create();
+    var mvMatrixStack = [];
+    var pMatrix = mat4.create();
+
+    function mvPushMatrix() {
+        var copy = mat4.create();
+        mat4.set(mvMatrix, copy);
+        mvMatrixStack.push(copy);
+    }
+
+    function mvPopMatrix() {
+        if (mvMatrixStack.length == 0) {
+            throw "Invalid popMatrix!";
+        }
+        mvMatrix = mvMatrixStack.pop();
+    }
+
+    function setMatrixUniforms() {
+        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+    }
+
+    var squareVertexPositionBuffer;
+    var squareVertexColorBuffer;
+
+    function initBuffers() {
+
+        squareVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+        vertices = [
+             0.125,  0.125,  0.0,
+            -0.125,  0.125,  0.0,
+             0.125, -0.125,  0.0,
+            -0.125, -0.125,  0.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        squareVertexPositionBuffer.itemSize = 3;
+        squareVertexPositionBuffer.numItems = 4;
+
+        squareVertexColorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
+        colors = []
+        for (var i = 0; i < 4; i++) {
+            colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        squareVertexColorBuffer.itemSize = 4;
+        squareVertexColorBuffer.numItems = 4;
+
+        ///////////////////////////////////////////////////////////
+
+        squareVertexPositionBuffer2 = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+  
+        vertices2 = [
+             1.0, 1.0, 0.0,
+            -1.0, 1.0, 0.0,
+             1.0, -1.0, 0.0,
+            -1.0, -1.0, 0.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+        squareVertexPositionBuffer2.itemSize = 3;
+        squareVertexPositionBuffer2.numItems = 4;
+
+        squareVertexColorBuffer2 = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+        colors2 = []
+        for (var i = 0; i < 4; i++) {
+            colors2 = colors2.concat([0.5, 0.5, 1.0, 1.0]);
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        squareVertexColorBuffer2.itemSize = 4;
+        squareVertexColorBuffer2.numItems = 4;
+    }
+
+
+    function drawScene(x,y) {
+        
+
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+
+        mat4.identity(mvMatrix);
+	
+	var vx=-1.25-0.125;
+	var vy=2.75+0.25;
+	var d = 0.3;
+	//var d=0.3;
+
+        mat4.translate(mvMatrix, [(vx+x*d), (vy-y*d), -7.0]);
+
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        setMatrixUniforms();
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+    }
+
+    function drawScene(x, y, color) {
+	var layout = new Array();
+	if (GameMode == 1){
+		layout[0] = 0.0;
+	}else if (GameMode == 2){
+		layout[0] = -1.8;
+		layout[1] = 1.8;
+	}else if (GameMode == 3){
+		layout[0] = -1.8;
+		layout[1] = 1.6;
+		layout[2] = 5.4;
+	}else if (GameMode == 4){
+		layout[0] = -2.8;
+		layout[1] = -0.0;
+		layout[2] = 3.4;
+		layout[3] = 6.8;
+	}
+        if (GameMode >= 1) {//For NOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+
+            mat4.identity(mvMatrix);
+
+            var vx = -1.25 - 0.125;
+            var vy = 2.75 + 0.25;
+            //var d = 0.3;
+            var d = 0.3;
+
+            mat4.translate(mvMatrix, [vx + x * d +layout[0], vy - y * d, -7.0]);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
+            colors = []
+            for (var i = 0; i < 4; i++) {
+                colors = colors.concat(color);
+            }
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+            squareVertexColorBuffer.itemSize = 4;
+            squareVertexColorBuffer.numItems = 4;
+
+            mvPushMatrix();
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
+            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+            setMatrixUniforms();
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+
+            mvPopMatrix();
+        } 
+    }
+
+    function DrawOutline(color2) {//Draw the Boards
+	var layout = new Array();
+	if (GameMode == 1){
+		layout[0] = 0.0;
+	}else if (GameMode == 2){
+		layout[0] = -1.8;
+		layout[1] = 1.8;
+	}else if (GameMode == 3){
+		layout[0] = -1.8;
+		layout[1] = 1.6;
+		layout[2] = 5.4;
+	}else if (GameMode == 4){
+		layout[0] = -2.8;
+		layout[1] = -0.0;
+		layout[2] = 3.4;
+		layout[3] = 6.8;
+	}
+	for (var looper = 0; looper < GameMode; looper++){
+	
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+
+            vertices2 = [
+                 1.5, 2.85, 0.0,
+                 1.6, 2.85, 0.0,
+                 1.5, -2.9, 0.0,
+                 1.6, -2.9, 0.0
+            ];
+            mat4.identity(mvMatrix);
+	    if (looper == 0){
+            	mat4.translate(mvMatrix, [layout[looper], 0, -7.0]);
+	    }else if (looper == 1 & GameMode == 2){
+		mat4.translate(mvMatrix, [layout[looper], 0, -7.0]);	
+            }else{
+		mat4.translate(mvMatrix, [layout[looper], 0, -15.0]);
+	    }
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+            squareVertexPositionBuffer2.itemSize = 3;
+            squareVertexPositionBuffer2.numItems = 4;
+
+            squareVertexColorBuffer2 = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+	    
+            colors2 = []
+            for (var i = 0; i < 4; i++) {
+                colors2 = colors2.concat(color2);
+            }
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors2), gl.STATIC_DRAW);
+            squareVertexColorBuffer2.itemSize = 4;
+            squareVertexColorBuffer2.numItems = 4;
+
+            mvPushMatrix();
+            //mat4.rotate(mvMatrix, degToRad(rSquare), [0, 0, 0]);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+            setMatrixUniforms();
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer2.numItems);
+
+            mvPopMatrix();
+
+            //////////////////////////////////////////////////////////////////////////////////
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+
+            if (canvasWidth > 320) {
+                vertices2 = [
+                     -1.55, 2.85, 0.0,
+                     -1.65, 2.85, 0.0,
+                     -1.55, -2.9, 0.0,
+                     -1.65, -2.9, 0.0
+                ];
+            } else {
+                vertices2 = [
+                      -1.5, 2.85, 0.0,
+                      -1.6, 2.85, 0.0,
+                      -1.5, -2.9, 0.0,
+                      -1.6, -2.9, 0.0
+                ];
+
+
+            }
+            mat4.identity(mvMatrix);
+             if (looper == 0){
+            	mat4.translate(mvMatrix, [layout[looper], 0, -7.0]);
+	    }else if (looper == 1 & GameMode == 2){
+		mat4.translate(mvMatrix, [layout[looper], 0, -7.0]);	
+            }else{
+		mat4.translate(mvMatrix, [layout[looper], 0, -15.0]);
+	    }
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+            squareVertexPositionBuffer2.itemSize = 3;
+            squareVertexPositionBuffer2.numItems = 4;
+
+            squareVertexColorBuffer2 = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+            colors2 = []
+            for (var i = 0; i < 4; i++) {
+                //colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
+                colors2 = colors2.concat(color2);
+            }
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors2), gl.STATIC_DRAW);
+            squareVertexColorBuffer2.itemSize = 4;
+            squareVertexColorBuffer2.numItems = 4;
+
+            mvPushMatrix();
+            //mat4.rotate(mvMatrix, degToRad(rSquare), [0, 0, 0]);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+            setMatrixUniforms();
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer2.numItems);
+
+            mvPopMatrix();
+            //////////////////////////////////////////////////////////////////////////////////////
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+
+            vertices2 = [
+                 -1.6, -2.85, 0.0,
+                 1.6, -2.85, 0.0,
+                 -1.6, -2.9, 0.0,
+                 1.6, -2.9, 0.0
+            ];
+            mat4.identity(mvMatrix);
+             if (looper == 0){
+            	mat4.translate(mvMatrix, [layout[looper], 0, -7.0]);
+	    }else if (looper == 1 & GameMode == 2){
+		mat4.translate(mvMatrix, [layout[looper], 0, -7.0]);	
+            }else{
+		mat4.translate(mvMatrix, [layout[looper], 0, -15.0]);
+	    }
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW);
+            squareVertexPositionBuffer2.itemSize = 3;
+            squareVertexPositionBuffer2.numItems = 4;
+
+            squareVertexColorBuffer2 = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+            colors2 = []
+            for (var i = 0; i < 4; i++) {
+                //colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
+                colors2 = colors2.concat(color2);
+            }
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors2), gl.STATIC_DRAW);
+            squareVertexColorBuffer2.itemSize = 4;
+            squareVertexColorBuffer2.numItems = 4;
+
+            mvPushMatrix();
+            //mat4.rotate(mvMatrix, degToRad(rSquare), [0, 0, 0]);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer2);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer2);
+            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer2.itemSize, gl.FLOAT, false, 0, 0);
+
+            setMatrixUniforms();
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer2.numItems);
+
+            mvPopMatrix();
+	}    
+
+    }
+
+    function draw(GameMode) {
+	if(GameMode > 0){
+	initGL(canvas);
+        initShaders();
+        initBuffers();
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    ////////////////////////////////////////////////////////////////////
+        DrawOutline([0.7,0.5,1.0,1.0]);
+
+	// draw board
+	for (var x = 0; x < engine.getWidth(); x++) {
+		// reset line (ruszyc pedzel ns poczatek wiersza)
+		for (var y = 0; y < engine.getHeight(); y++) {
+			// ruszyc pedzel w prawo
+			if (engine.getBoard(x, y) == 0) continue;
+			drawScene(x,y, [1.0,0.9,0.4,1.0]);
+		}
+	}
+
+        // draw piece
+	if (newcolor == 1) {
+
+	    num1 = Math.random();
+	    num2 = Math.random();
+	    num3 = Math.random();
+	    newcolor = 0;
+	if(num1 == num2){
+		if(num2 == num3){
+			num3 = 0.5;
+		}
+	}else{}
+
+	}
+	for (var x = 0; x < 4; x++) {
+		for (var y = 0; y < 4; y++) {
+		    if (engine.getPiece(x, y) == 0) continue;
+		    drawScene(engine.getPieceX() + x, engine.getPieceY() + y, [num1, num2, num3, 1.0]);
+		}
+	}
+ 	
+	document.getElementById("score").innerHTML = engine.getScore();
+	document.getElementById("level").innerHTML = engine.getLevel();
+	document.getElementById("co").innerHTML = engine.getlinesCompletedCount();
+	document.getElementById("lines").innerHTML = engine.getLinesCompleted();
+	
+	if (engine.isGameOver()) {
+		clearInterval(drawInterval);
+		var nameGiven = prompt("Please enter your name");
+		$.post("addScore.php", { name: nameGiven, score: engine.getScore(), auth: document.cookie});
+	}
+
+	}//GameMode Flag
+
+	if(GameMode > 1){
+
+	}	
+	if(GameMode > 2){
+	
+	}	
+	if(GameMode > 3){
+
+	}	
+
+
+    }
+
+
+function BeingAttacked(NumberofAttacks){
+	for(var loop = 1; loop <= (NumberofAttacks/2); loop++){
+		engine.Attacked();
+	}
+}
+
+
+function keyboardFunc(e) {
+	switch (e.keyCode) {
+		case 38: // up
+			engine.rotatePiece();
+			break;
+	    case 40: // down
+	                newcolor = 1;
+			engine.moveDown();
+			break;
+		case 37: // left
+			engine.moveLeft();
+			break;
+		case 39: // right
+			engine.moveRight();
+			break;
+	}
+}
+ 
+window.addEventListener('keydown', keyboardFunc, true);
+
+initGame(GameMode); //These were the single canvas approach of Multiplayer game board setup
+engine.start();
+drawInterval = setInterval("draw(GameMode)", 20);
+AttackedInterval = setInterval("BeingAttacked(4)", 5000);//Test code
+//drawInterval = setInterval("draw()", 20); 
+
+
+
+</script>
+
+</body>
+
+</html>
