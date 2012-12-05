@@ -10,13 +10,17 @@ login(Email,Password) ->
 		false -> {error, "Email and Password do not match"}
 	end.
 
-register(Email,Password,SecretAnswer) ->
+register(Email,DisplayName,Password,SecretAnswer) ->
 	Salt = mochihex:to_hex(erlang:md5(Email)),
 	HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
 	HashedAnswer = mochihex:to_hex(erlang:md5(Salt ++ SecretAnswer)),
 	case db:qexists("select email from user where email=?",[Email]) of
-		true -> {error, "Name Exists"}; %% it already exists, error
-		false -> db:qi("insert into user(email,password,wins,losses,elo,SecretQuestionAnswer) values(?,?,0,0,1200,?)",[Email,HashedPassword,HashedAnswer]) 
+		true -> {error, "Email Exists"}; %% it already exists, error
+		false -> 
+			case db:qexists("select username from user where username=?",[DisplayName]) of 
+				true-> {error,"Display name is already in use"};
+				false -> db:qi("insert into user(email,password,wins,losses,elo,SecretQuestionAnswer) values(?,?,0,0,1200,?)",[Email,HashedPassword,HashedAnswer])
+			end
 	end.
 
 changePassword(Email,Password,NewPassword) ->
