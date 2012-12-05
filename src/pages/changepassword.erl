@@ -63,10 +63,7 @@ event(changePW) ->
 	Usr = wf:q(idTextbox),
 	Password = wf:q(currentPWBox),
 	NewPassword = wf:q(passwordBox),
-	Salt = mochihex:to_hex(erlang:md5(Usr)),
-	HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
-	HashedNewPassword = mochihex:to_hex(erlang:md5(Salt ++ NewPassword)),
-	case usr:changePassword(Usr,HashedPassword,HashedNewPassword) of
+	case usr:changePassword(Usr,Password,NewPassword) of
 		{error, Reason} -> wf:wire(#alert{text=Reason});
 		ID when is_integer(ID) -> 
 			wf:wire(#alert{text="Password Changed!"}),

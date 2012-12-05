@@ -62,9 +62,7 @@ event(logout) ->
 event(login) ->
         Usr = wf:q(idTextbox),
         Password = wf:q(pwTextbox),
-        Salt = mochihex:to_hex(erlang:md5(Usr)),
-        HashedPassword = mochihex:to_hex(erlang:md5(Salt ++ Password)),
-        case usr:login(Usr,HashedPassword) of
+        case usr:login(Usr,Password) of
             {error, Reason} -> wf:wire(#alert{text=Reason});
             ok -> 
                 wf:user(Usr),

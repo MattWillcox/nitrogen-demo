@@ -2,6 +2,7 @@
 -module (profile).
 -compile(export_all).
 -include_lib("nitrogen_core/include/wf.hrl").
+-include_lib ("nitrogen_core/include/google_chart.hrl").
 
 main() -> 
 	case wf:user() /= undefined of
@@ -15,7 +16,13 @@ main_authorized() -> #template{file="site/templates/beta.html"}.
 title() -> "href Tetris".
 
 
-body() -> 
+body() ->
+Usr = wf:user(),
+LastElos = elo:lastelos(Usr),
+MyRecord = elo:myElo(Usr),
+WinLoss = lists:map(fun([Win, Loss, _]) -> integer_to_list(Win) ++ " - " ++ integer_to_list(Loss) end, MyRecord),
+ELO = lists:map(fun([_, _, Elo]) -> integer_to_list(Elo) end, MyRecord),
+
 
 Body = [
 	#container_12 { body = [
@@ -32,32 +39,56 @@ Body = [
 
  		#grid_clear{},
         #grid_12 {
-        	body = [
+			body=[
 				#panel{
+					class=title,
 					body=[
-						#panel{
-							class=title,
-							body=[
-								#h1 {text = "Profile"}
-							]
-						},
-						#panel{
-							class=profileWrapper,
-							body=[
-								#p{text="My profile comes here"},
-								#panel{body=[
-										#label{text="id: "},
-										#label{text="win-loss: "},
-										#label{text="rating: "},
-										#label{text="rank: "}
-										]}	
-							]
-						},
-						#link{text = "Want to change password?", url = "/changepassword"}
+						#h1 {text = "Profile"}
 					]
-				}
+				},
+				#panel{
+					class=profileWrapper,
+					body=[
+						#panel{body=[
+								#label{text="email: " ++ Usr},
+								#label{text="win-loss: " ++  WinLoss},
+								#label{text="rating: " ++ ELO}
+						]}
+					]
+				},
+				#link{text = "Want to change password?", url = "/changepassword"},
+				#br{},
+
+				#h4 { text="ELO History Chart" },
+				#google_chart {
+					type=line,
+			        title="Line Chart", width=400, height=400, grid_x=25, grid_y=33,
+			        data=[
+			            #chart_data { legend="Data 1", color="2768A9", line_width=5, 
+			                values= lists:map(fun([Elo,_]) -> lists:append([], Elo) end, LastElos)
+			       		}
+			        ]
+			    },
+
+				#h4 {text = "Win/Loss Rate"},
+				#google_chart {
+					type=pie3d,
+			        title="Pie Chart", width=400, height=400,
+			        axes=[
+            			#chart_axis { position=bottom, labels=["Win", "Loss"] }
+        			],
+			        data=[
+			            #chart_data { legend="Data 1", color="2768A9", line_width=5, 
+			                values= lists:map(fun([Win, Loss,_]) ->
+			                	[Win,Loss]
+			                	
+			                	end, MyRecord)
+			       		}
+			        ]
+			    }
 			]
 		}
+
 	]}],
 
     Body.
