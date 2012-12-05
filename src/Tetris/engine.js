@@ -94,6 +94,26 @@ function Engine() {
 	this.getPiece = function(x, y) {
 		return this.piece[y * 4 + x];
 	};
+	this.Attacked = function(){
+		for (var y1 = 0; y1 < 20; y1++) {
+			for (var x = 0; x < this.width; x++) {
+				this.board[(y1) * this.width + x] = this.board[(y1+1) * this.width + x];
+			}
+		}
+		var theHole = Math.floor(Math.random()*10)+1;
+		for (var x = 0; x < this.width; x++) {
+			this.board[(this.height-1)*this.width + x]=0;
+			if (x == theHole){
+			//Leave a Hole			
+			}else{
+				this.board[(this.height-1)*this.width + x]=1;
+			}
+
+
+
+
+		}
+	};
 	
 	this.getNextPiece = function(x, y) {
 		return pieces[Math.floor(this.nextPiece * 7)][y * 4 + x];
