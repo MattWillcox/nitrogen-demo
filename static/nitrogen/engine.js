@@ -1,9 +1,3 @@
-/**
- * @authors:
- * Michal Ciebiada
- * Filip Kufrej
- */
-
 pieces = [
         [ 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -14,6 +8,7 @@ pieces = [
 		[ 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 ] ];
 
 function Engine() {
+        var colide = false;	// indicates when a new series of line complete is happening
 	this.width = 10;	// width of the board (in squares)
 	this.height = 20;	// height of the board
 	this.board = [];	// fallen pieces (accessing: y * width + x)
@@ -38,6 +33,7 @@ function Engine() {
 	this.score = 0;
 	this.level = 1;
 	this.linesCompleted = 0;
+	this.linesCompletedCount = 0;
 	
 	this.delay = 500;
 	
@@ -98,14 +94,43 @@ function Engine() {
 	this.getPiece = function(x, y) {
 		return this.piece[y * 4 + x];
 	};
+	this.Attacked = function(){
+		for (var y1 = 0; y1 < 20; y1++) {
+			for (var x = 0; x < this.width; x++) {
+				this.board[(y1) * this.width + x] = this.board[(y1+1) * this.width + x];
+			}
+		}
+		var theHole = Math.floor(Math.random()*10)+1;
+		for (var x = 0; x < this.width; x++) {
+			this.board[(this.height-1)*this.width + x]=0;
+			if (x == theHole){
+			//Leave a Hole			
+			}else{
+				this.board[(this.height-1)*this.width + x]=1;
+			}
+
+
+
+
+		}
+	};
 	
 	this.getNextPiece = function(x, y) {
 		return pieces[Math.floor(this.nextPiece * 7)][y * 4 + x];
 	};
-
+	this.getlinesCompletedCount = function () {
+	    return this.linesCompletedCount;
+	};
+    //////////////////////////////////////////////////////////
+	this.resetlinesCompleted = function () {
+	    var temp = this.getlinesCompletedCount;
+	    this.linesCompletedCount = 0;
+	    return temp;
+	};
+    //////////////////////////////////////////////////////////
 	this.newPiece = function() {
 		this.instantDrop = false;
-		
+		newcolor = 1;
 		this.pieceX = 5;
 		this.pieceY = 0;
 		
@@ -193,7 +218,7 @@ function Engine() {
 		}
 	}
 	
-	this.work = function() {
+	this.work = function () {
 		if (this.paused)
 			return;
 
@@ -242,8 +267,13 @@ function Engine() {
 				for (var x = 0; x < this.width; x++) {
 					sum += this.board[y * this.width + x];
 				}
-				
 				if (sum == this.width) {	// got line completed
+				    if (colide == false) {
+				        this.linesCompletedCount = 0;
+				        colide = true;
+				    }
+
+				    this.linesCompletedCount++;
 					this.linesCompleted++;
 					
 					if (this.linesCompleted >= 1 && this.linesCompleted <= 90) {
@@ -267,14 +297,13 @@ function Engine() {
 					}
 				}
 			}
-			
+			colide = false;
 			this.newPiece();
 		}
 		
 		return willCollide;
 	}
-	
-	this.start = function() {
+		this.start = function() {
 		var self = this;
 		if (!this.paused) {
 			setTimeout(function() {

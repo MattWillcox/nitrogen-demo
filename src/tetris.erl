@@ -4,62 +4,53 @@
 -include_lib("nitrogen_core/include/wf.hrl").
 -include("records.hrl").
 
-main() -> #template { file="./site/templates/tetris.html" }.
+main() -> #template { file="./site/templates/bare.html" }.
 
 
 title() -> "Href Tetris".
 headline() -> "Href Tetris-Comet test".
 
-
-body() -> 
-
-	wf:comet_global(fun() -> comet_loop() end, my_pool),
-
-    [
-	#p{},
-        #button{id=action,postback=some_event,text="Test"},
-	#button{id=action,postback=comet_event,text="Send"},
-	#button{id=action,postback=test_event,text="COMET"},
-	#panel{ id=placeholder,class=placeholder},
-	#p{}
-        
-    ].
-	
-
-event(some_event) ->
-	wf:wire("test++"), %%Increatment test
-	wf:wire("textfield.textContent = test");
+body() ->
+	wf:comet_global(fun() -> chat_loop() end, myroom),
+	wf:wire(#api {name=testAPI, tag=fun1}),
+	wf:wire(#api {name=testAPI2, tag=fun2}),
+        wf:wire("var count = [5,6,7,8];"),
+	wf:wire("var count2 = 0;"),
+        #panel{
+                body=[
+                        #flash{},
+                        #p{},
+                        "<a onclick=\"page.testAPI(count);\">Count up</a><br>",
+			"<a onclick=\"page.testAPI2(count);\">Send Through Comet</a><br>",
+			"<p id=TT>~~</p>"
+                ]
+        }.
 
 
-event(comet_event) ->
+api_event(testAPI, _, [TheList]) ->
+        wf:flash(wf:f("The count is ~p~n", [TheList]));
 
-    wf:send_global(my_pool, {message, "Clicked"});
-
-event(test_event) ->
-%% trying to reference var test in the Template file 
-    %%message = wf:q(test),
-	message = test,
-    wf:send_global(my_pool, {message, "CometT"}); 
+api_event(testAPI2, _,[TheList]) ->
+	wf:send_global(myroom, {msg,[TheList]}).
 
 event(_) -> ok.
 
-comet_loop() ->
+chat_loop() ->
     receive 
-	{message, "CometT"} -> 
-	    wf:wire("textfield.textContent = obj('message')"),
-	    wf:insert_bottom(placeholder, "Comet"),
-	wf:wire("obj('placeholder').scrollTop = obj('placeholder').scrollHeight;"),
-
-	wf:flush();
-
-	{message, "Clicked"} ->
-            wf:wire("test = test+10"),
-	    wf:wire("textfield.textContent = test"),
-	    wf:insert_bottom(placeholder, "Clicked"),
-	wf:wire("obj('placeholder').scrollTop = obj('placeholder').scrollHeight;"),
-
-	wf:flush()
+        'INIT' ->
+            wf:flush();
+        {msg, Msg} ->
+	    %%TD = wf:to_integer(wf:coalesce(Msg)),
+	    %%TD = [wf:to_integer(wf:coalesce(Msg))+wf:to_integer(wf:coalesce(Msg))],
+	    %%wf:wire("count = count + Msg;"),
+	    %%wf:wire("count++;"),
+	    %%wf:flash(wf:f("The count is ~p~n", TD)),
+	    wf:flash(wf:f("var count2= ~p~n", Msg)),
+		wf:wire(wf:f("count2= ~p~n", Msg)),
+wf:wire(";"),
+            %%wf:flash(wf:f("The count is ~p~n", Msg)),
+            wf:flush()
     end,
-comet_loop().  
+chat_loop(). 
 
 
