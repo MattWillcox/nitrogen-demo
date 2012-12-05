@@ -34,10 +34,11 @@ body() ->
         #grid_8 {omega=true, body=inner_body() }
     ]}.
 inner_body() -> 
+    Username = db:q("select username from user where email = ?", [wf:user()]),
 	wf:comet_global(fun() -> chat_loop() end, chatroom),
     [
         #span { text="Your chatroom name: " }, 
-        #textbox { id=userNameTextBox, text="Anonymous", style="width: 100px;", next=messageTextBox },
+        #span { text = Username },
         #panel { id=chatHistory, class=chat_history },
 
         #p{},
