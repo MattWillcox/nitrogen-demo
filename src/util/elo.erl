@@ -5,5 +5,7 @@
 top10() ->
 	db:q("select username,wins,losses,elo from user ORDER BY elo DESC LIMIT 0,10").
 
-adjustElo() ->
-	ok.
+calcElos(Player, Elo) ->
+
+
+adjustElo({Player,ELO}, Winner) ->
