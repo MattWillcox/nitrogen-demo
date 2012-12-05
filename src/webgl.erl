@@ -10,6 +10,7 @@ title() -> "Hello from webgl.erl!".
 
 body() -> 
 	wf:comet_global(fun() -> chat_loop() end, myroom),
+	wf:wire("var ParcticeMode = 0;"),%%0= false 1= true
 	wf:wire("var GameMode = 4;"),
 	%%wf:wire("var Testing;"),
 	wf:wire(#api {name=testAPI, tag=fun1}),
@@ -91,57 +92,44 @@ chat_loop() ->
 	    %%wf:wire("count++;"),
 	    %%wf:flash(wf:f("The count is ~p~n", TD)),
 	    %%wf:flash(wf:f("var count2= ~p~n", Msg)),
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             %%wf:flash(wf:f("The count is ~p~n", Msg)),
             wf:flush();
 	{msg, Msg, "ID2"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("GameBoard2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID3"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID4"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID12"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID22"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("GamePiece2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID32"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID42"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID13"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID23"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID33"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "ID43"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush();
 	{msg, Msg, "Attack"} ->
-		wf:wire(wf:f("Testing2= ~p~n", Msg)),
-		wf:wire(";"),
+		wf:wire(wf:f("Testing2= ~p~n ;", Msg)),
             wf:flush()
     end,
 chat_loop(). 

@@ -95,7 +95,9 @@ function Engine() {
 	this.getBoard = function(x, y) {
 		return this.board[y * this.width + x];
 	};
-
+	this.getPiece2 = function(x) {
+		return this.piece[x];
+	};
 	this.getPiece = function(x, y) {
 		return this.piece[y * 4 + x];
 	};
