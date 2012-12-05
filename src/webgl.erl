@@ -10,7 +10,7 @@ title() -> "Hello from webgl.erl!".
 
 body() -> 
 	wf:comet_global(fun() -> chat_loop() end, myroom),
-	wf:wire("var GameMode = 2;"),
+	wf:wire("var GameMode = 4;"),
 	%%wf:wire("var Testing;"),
 	wf:wire(#api {name=testAPI, tag=fun1}),
 	wf:wire(#api {name=testAPI2, tag=fun2}),
