@@ -43,13 +43,11 @@ inner_body() ->
 
         #p{},
         #textbox { id=messageTextBox, style="width: 350px; height: 20px; word-wrap: break-word;", next=sendButton },
-        #button { id=sendButton, style="width: 75px; margin-left: 10px;", text="Send", postback=chat }
+        #button { id=sendButton, style="width: 75px; margin-left: 10px;", text="Send", postback={chat, Username}}
     ].
 		
 
-event(chat) ->
-
-    Username = wf:user(),
+event({chat, Username}) ->
     Message = wf:q(messageTextBox),
     wf:send_global(chatroom, {message, Username, Message}),
     wf:wire("obj('messageTextBox').focus(); obj('messageTextBox').select();");
