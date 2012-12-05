@@ -397,11 +397,17 @@ Your browser does not support the canvas element.
 
             var vx = -1.25 - 0.125;
             var vy = 2.75 + 0.25;
-            //var d = 0.3;
             var d = 0.3;
 
-		
-            mat4.translate(mvMatrix, [vx + x * d +layout[0], vy - y * d, -7.0]);
+
+	    if (PlayerNumber == 0){
+            	mat4.translate(mvMatrix, [vx + x * d +layout[PlayerNumber], vy - y * d, -7.0]);
+	    }else if (PlayerNumber == 1 & GameMode == 2){
+		mat4.translate(mvMatrix, [vx + x * d +layout[PlayerNumber], vy - y * d, -7.0]);	
+            }else{
+		mat4.translate(mvMatrix, [vx + x * d +layout[PlayerNumber], vy - y * d, -15.0]);
+	    }
+
 
             gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
             colors = []
@@ -624,21 +630,15 @@ Your browser does not support the canvas element.
 	//////////////////////////////////////////
 
 	// draw board
-
-		if (GameMode > 0){}
-		if (GameMode > 1){
-			if (GameMode == 2){}
-			else{}
-		}
-		if (GameMode > 2){}
-		if (GameMode > 3){}
-
-		
+	
 		for (var x = 0; x < engine.getWidth(); x++) {
 			// reset line (ruszyc pedzel ns poczatek wiersza)
 			for (var y = 0; y < engine.getHeight(); y++) {
 				if (engine.getBoard(x, y) == 0) continue;
+				drawScene(x,y, [1.0,0.9,0.4,1.0],GameMode,0);
 				drawScene(x,y, [1.0,0.9,0.4,1.0],GameMode,1);
+				drawScene(x,y, [1.0,0.9,0.4,1.0],GameMode,2);
+				drawScene(x,y, [1.0,0.9,0.4,1.0],GameMode,3);
 			}
 		}
 
@@ -672,7 +672,10 @@ Your browser does not support the canvas element.
 	for (var x = 0; x < 4; x++) {
 		for (var y = 0; y < 4; y++) {
 		    if (engine.getPiece(x, y) == 0) continue;
-		    drawScene(engine.getPieceX() + x, engine.getPieceY() + y, [num1, num2, num3, 1.0],GameMode,1);
+		    drawScene(engine.getPieceX() + x, engine.getPieceY() + y, [num1, num2, num3, 1.0],GameMode,0);
+		drawScene(engine.getPieceX() + x, engine.getPieceY() + y, [num1, num2, num3, 1.0],GameMode,1);
+		drawScene(engine.getPieceX() + x, engine.getPieceY() + y, [num1, num2, num3, 1.0],GameMode,2);
+		drawScene(engine.getPieceX() + x, engine.getPieceY() + y, [num1, num2, num3, 1.0],GameMode,3);
 		}
 	}
 
