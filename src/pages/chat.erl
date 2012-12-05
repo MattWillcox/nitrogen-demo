@@ -36,7 +36,6 @@ body() ->
 inner_body() -> 
     Username = db:q("select username from user where email =?", [wf:user()]),
 	wf:comet_global(fun() -> chat_loop() end, chatroom),
-	CurrentUser = wf:user(),
     [
         #span { text="Your chatroom name: " }, 
         #span { text = Username },

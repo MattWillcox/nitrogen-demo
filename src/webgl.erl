@@ -70,11 +70,12 @@ api_event(testAPI10, _,[TheList]) ->
 api_event(testAPI11, _,[TheList]) ->
 
 	wf:send_global(myroom, {msg,[TheList],"ID33"});
+
 api_event(testAPI12, _,[TheList]) ->
 
-	wf:send_global(myroom, {msg,[TheList],"ID43"}).
-api_event(testAPI13, _,[TheList]) ->
+	wf:send_global(myroom, {msg,[TheList],"ID43"});
 
+api_event(testAPI13, _,[TheList]) ->
 	wf:send_global(myroom, {msg,[TheList],"Attack"}).
 
 
