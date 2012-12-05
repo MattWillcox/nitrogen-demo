@@ -34,7 +34,7 @@ body() ->
         #grid_8 {omega=true, body=inner_body() }
     ]}.
 inner_body() -> 
-    Username = db:q("select username from user where email = ?", [wf:user()]),
+    Username = db:q("select username from user where email =?", [wf:user()]),
 	wf:comet_global(fun() -> chat_loop() end, chatroom),
 	CurrentUser = wf:user(),
     [
