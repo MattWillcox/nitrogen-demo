@@ -4,7 +4,7 @@
 -include_lib("nitrogen_core/include/wf.hrl").
 -include("records.hrl").
 
-main() -> #template { file="./site/templates/bare.html" }.
+main() -> #template { file="./site/templates/beta.html" }.
 
 title() -> "Login Page".
 
@@ -34,18 +34,10 @@ body() ->
 					#panel{
 						body=[
 							#panel{
-								class=title,
-								body=[
-									#h1 {text = "You need to be logged in to see this page."}
-								]
-							},
-
-
-
-							#panel{
-								class=loginboxWrapper,
+								class=redirectLoginboxWrapper,
 								id=loginbox,
 								body=[
+									#p {text = "You need to be logged in to see this page."},
 									#label{text="Email"},
 									#textbox{ id=idTextbox, class=idTextbox, next=pwTextbox},
 									#label{text="Password"},

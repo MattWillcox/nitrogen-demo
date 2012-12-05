@@ -23,26 +23,51 @@ body() ->
 	    #confirm_password { password=pwTextbox, text="Passwords must match." }
 	]}),
 
-    [
-	    #panel{
-	        body=[
-	        #h1 {text = "Create New Account"},
-	        #label {text = "Please enter your Email address"},
-	        #textbox { id=idTextbox, class=idTextbox, text="", next=pwTextbox},
-	        #label {text= "Please enter new password"},
-	        #password { id=pwTextbox, class=pwTextbox, text="", next=pwConfirmTextbox},
-	        #label {text= "Please enter password again to confirm"},
-	        #password { id=pwConfirmTextbox, class=pwConfirmTextbox, text="", next=secretAnswerTextbox},
-	        #br{},
-	        #label {text= "Security Question: When is your birthday (yyyyMMdd)? This will be used to reset your password."},
-	        #textbox { id=secretAnswerTextbox, class=secretAnswerTextbox, text="", next=registerButton},
-	        #br{},
-	        #button { id=registerButton, text = "Create New Account", postback=register},
-	        #br{}
-	        ]
-	    },
-	    #flash{}
-    ].
+	Body = [
+		#container_12 {
+			body = [
+		        #grid_12 {
+		        	style = "border: 10px solid grey; text-align: center;",
+		        	body = [ 
+		                #singlerow {
+		                	style="width: 920px;",
+		                	cells=[
+		           				#tablecell { align=center, body=#link { text="Home", url = "/beta" }},
+					            #tablecell { align=center, body=#link { text="Leaderboard", url = "/leaderboard" }},
+					            #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
+					            #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
+					            #tablecell { align=center, body=#link { text="Chat", url = "/beta" }},
+					            #tablecell { align=center, body=#link { text="Logout", postback = logout}}
+		        			]
+		        		}
+		        	]
+		        },
+
+
+	 			#grid_clear{},
+	        	#grid_12 {
+		        	body = [
+			        #h1 {text = "Create New Account"},
+			        #label {text = "Please enter your Email address"},
+			        #textbox { id=idTextbox, class=idTextbox, text="", next=pwTextbox},
+			        #label {text= "Please enter new password"},
+			        #password { id=pwTextbox, class=pwTextbox, text="", next=pwConfirmTextbox},
+			        #label {text= "Please enter password again to confirm"},
+			        #password { id=pwConfirmTextbox, class=pwConfirmTextbox, text="", next=secretAnswerTextbox},
+			        #br{},
+			        #label {text= "Security Question: When is your birthday (yyyyMMdd)? This will be used to reset your password."},
+			        #textbox { id=secretAnswerTextbox, class=secretAnswerTextbox, text="", next=registerButton},
+			        #br{},
+			        #button { id=registerButton, text = "Create New Account", postback=register},
+			        #br{}
+					]
+				}
+			]
+		}
+	],
+
+    Body.
+
 
 event(register) ->
 	Email = wf:q(idTextbox),

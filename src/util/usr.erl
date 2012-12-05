@@ -16,7 +16,7 @@ register(Email,Password,SecretAnswer) ->
 	HashedAnswer = mochihex:to_hex(erlang:md5(Salt ++ SecretAnswer)),
 	case db:qexists("select email from user where email=?",[Email]) of
 		true -> {error, "Name Exists"}; %% it already exists, error
-		false -> db:qi("insert into user(email,password,SecretQuestionAnswer) values(?,?,?)",[Email,HashedPassword,HashedAnswer]) 
+		false -> db:qi("insert into user(email,password,wins,losses,elo,SecretQuestionAnswer) values(?,?,0,0,1200,?)",[Email,HashedPassword,HashedAnswer]) 
 	end.
 
 changePassword(Email,Password,NewPassword) ->

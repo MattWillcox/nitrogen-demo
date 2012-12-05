@@ -58,3 +58,16 @@ line-height: 1em;
 margin: 0em 0em;
 
 }
+
+.redirectLoginboxWrapper {
+	width:50%;
+	margin:50px auto;
+}
+
+.redirectLoginboxWrapper .textbox {
+	width:50%;
+}
+
+.redirectLoginboxWrapper .password {
+	width:50%;
+}

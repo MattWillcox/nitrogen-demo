@@ -21,25 +21,43 @@ body() ->
 	    #confirm_password { password=passwordBox, text="Passwords must match." }
 	]}),
 
-    [
-    	#h1 {text = "Change your password"},
-	    #panel{
-	    	class=profileWrapper,
-	        body=[
-	        #label {text = "Please enter your Email address"},
-	        #textbox { id=idTextbox, class=idTextbox, text="", next=currentPWBox},
-	        #label {text = "Please enter current password"},
-	        #password { id=currentPWBox, class=currentPWTextbox, text="", next=passwordBox},
-	        #label {text= "Please enter new password"},
-	        #password { id=passwordBox, class=pwTextbox, text="", next=passwordConfirmBox },
-	        #label {text= "Please enter password again to confirm"},
-	        #password { id=passwordConfirmBox, class=pwConfirmTextbox, text="", next=pwChangeButton},
-	        #br{},
-	        #button { id=pwChangeButton, text = "Change Password!", postback=changePW}
-	        ]
-	    },
-	    #flash{}
-    ].
+    Body = [
+		#container_12 { body = [
+	        #grid_12 { style = "border: 10px solid grey; text-align: center;", body = [ 
+	                #singlerow {style="width: 920px;", cells=[
+	            #tablecell { align=center, body=#link { text="Home", url = "/beta" }},
+	            #tablecell { align=center, body=#link { text="Leaderboard", url = "/leaderboard" }},
+	            #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
+	            #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
+	            #tablecell { align=center, body=#link { text="Chat", url = "/beta" }},
+	            #tablecell { align=center, body=#link { text="Logout", postback = logout}}
+	        ]}]},
+
+
+	 		#grid_clear{},
+	        #grid_12 {
+	        	body = [
+					    	#h1 {text = "Change your password"},
+						    #panel{
+						    	class=profileWrapper,
+						        body=[
+						        #label {text = "Please enter your Email address"},
+						        #textbox { id=idTextbox, class=idTextbox, text="", next=currentPWBox},
+						        #label {text = "Please enter current password"},
+						        #password { id=currentPWBox, class=currentPWTextbox, text="", next=passwordBox},
+						        #label {text= "Please enter new password"},
+						        #password { id=passwordBox, class=pwTextbox, text="", next=passwordConfirmBox },
+						        #label {text= "Please enter password again to confirm"},
+						        #password { id=passwordConfirmBox, class=pwConfirmTextbox, text="", next=pwChangeButton},
+						        #br{},
+						        #button { id=pwChangeButton, text = "Change Password!", postback=changePW}
+						        ]
+						    },
+						    #flash{}
+				]
+			}
+		]}],
+    Body.
 
 event(changePW) ->
 	Usr = wf:q(idTextbox),
