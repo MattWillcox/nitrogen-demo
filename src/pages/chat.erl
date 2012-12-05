@@ -11,7 +11,7 @@ main() ->
 	end.
 	
 
-main_authorized() -> #template { file="./site/templates/chat.html" }.
+main_authorized() -> #template { file="./site/templates/beta.html" }.
 
 
 title() -> "Chat Room".
