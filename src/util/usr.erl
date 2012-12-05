@@ -19,7 +19,7 @@ register(Email,DisplayName,Password,SecretAnswer) ->
 		false -> 
 			case db:qexists("select username from user where username=?",[DisplayName]) of 
 				true-> {error,"Display name is already in use"};
-				false -> db:qi("insert into user(email,password,wins,losses,elo,SecretQuestionAnswer) values(?,?,0,0,1200,?)",[Email,HashedPassword,HashedAnswer])
+				false -> db:qi("insert into user(email,username,password,wins,losses,elo,SecretQuestionAnswer) values(?,?,?,0,0,1200,?)",[Email,DisplayName,HashedPassword,HashedAnswer])
 			end
 	end.
 
