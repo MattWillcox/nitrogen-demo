@@ -71,3 +71,22 @@ margin: 0em 0em;
 .redirectLoginboxWrapper .password {
 	width:50%;
 }
+
+.profileInfoWrapper {
+	width:33%;
+	left:0px;
+}
+
+.linechartWrapper {
+	position:absolute;
+	top:10%;
+	width:33%;
+	margin:20px 33% 0px 30%;
+}
+
+.piechartWrapper {
+	position:absolute;
+	top:10%;
+	width:33%;
+	margin:20px 0px 0px 66%;
+}

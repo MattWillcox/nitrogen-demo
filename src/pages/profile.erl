@@ -2,6 +2,7 @@
 -module (profile).
 -compile(export_all).
 -include_lib("nitrogen_core/include/wf.hrl").
+-include_lib ("nitrogen_core/include/google_chart.hrl").
 
 main() -> 
 	case wf:user() /= undefined of
@@ -15,7 +16,20 @@ main_authorized() -> #template{file="site/templates/beta.html"}.
 title() -> "href Tetris".
 
 
-body() -> 
+body() ->
+Usr = wf:user(),
+LastElos = elo:lastelos(Usr),
+	case LastElos of 
+		[] -> EloValues = [1200];
+		_ -> EloValues = lists:sublist(lists:map(fun([Elo,_]) -> lists:append([], Elo) end, LastElos), 20)
+	end,
+MaxEloValues = lists:max(EloValues),
+MinEloValues = lists:min(EloValues),
+MyRecord = elo:myElo(Usr),
+WinLoss = lists:nth(1, lists:map(fun([Win, Loss, _]) -> [Win, Loss] end, MyRecord)),
+WinLossString = lists:map(fun([Win, Loss, _]) -> integer_to_list(Win) ++ " - " ++ integer_to_list(Loss) end, MyRecord),
+ELO = lists:map(fun([_, _, Elo]) -> integer_to_list(Elo) end, MyRecord),
+
 
 Body = [
 	#container_12 { body = [
@@ -32,32 +46,54 @@ Body = [
 
  		#grid_clear{},
         #grid_12 {
-        	body = [
+			body=[
 				#panel{
+					class=profileInfoWrapper,
 					body=[
-						#panel{
-							class=title,
-							body=[
-								#h1 {text = "Profile"}
-							]
-						},
-						#panel{
-							class=profileWrapper,
-							body=[
-								#p{text="My profile comes here"},
-								#panel{body=[
-										#label{text="id: "},
-										#label{text="win-loss: "},
-										#label{text="rating: "},
-										#label{text="rank: "}
-										]}	
-							]
-						},
-						#link{text = "Want to change password?", url = "/changepassword"}
+						#panel{body=[
+								#h1 {text = "Profile"},
+								#label{text="email: " ++ Usr},
+								#label{text="win-loss: " ++  WinLossString},
+								#label{text="rating: " ++ ELO},
+								#link{text = "Want to change password?", url = "/changepassword"}
+						]}
 					]
-				}
+				},
+
+				#panel {class=linechartWrapper, body= [
+					#h4 { style="margin:0px;", text="ELO History" },
+					#google_chart {
+						type=line,
+				        width=300, height=150, grid_x=25, grid_y=25,
+				        axes=[
+				        	#chart_axis {position=left, labels = [MinEloValues - 100, (MinEloValues + MaxEloValues) / 2, MaxEloValues + 100]}
+				        ],
+				        data=[
+				            #chart_data { color="2768A9", line_width=5,
+				                min_value = MinEloValues - 100,
+				                max_value = MaxEloValues + 100,
+				                values = EloValues
+				       		}
+			        ]
+			    }]},
+
+			    #panel {class=piechartWrapper, body =[
+					#h4 {style="margin:0px;", text = "Win/Loss Rate"},
+					#google_chart {
+						type=pie3d,
+				        width=300, height=150,
+				        axes=[
+	            			#chart_axis { position=bottom, labels=["Win", "Loss"] }
+	        			],
+				        data=[
+				            #chart_data {
+				                values= WinLoss
+				       		}
+				        ]
+				    }]}
 			]
 		}
+
 	]}],
 
     Body.
