@@ -19,8 +19,12 @@ title() -> "href Tetris".
 body() ->
 Usr = wf:user(),
 LastElos = elo:lastelos(Usr),
+EloValues = lists:sublist(lists:map(fun([Elo,_]) -> lists:append([], Elo) end, LastElos), 20),
+MaxEloValues = lists:max(EloValues),
+MinEloValues = lists:min(EloValues),
 MyRecord = elo:myElo(Usr),
-WinLoss = lists:map(fun([Win, Loss, _]) -> integer_to_list(Win) ++ " - " ++ integer_to_list(Loss) end, MyRecord),
+WinLoss = lists:nth(1, lists:map(fun([Win, Loss, _]) -> [Win, Loss] end, MyRecord)),
+WinLossString = lists:map(fun([Win, Loss, _]) -> integer_to_list(Win) ++ " - " ++ integer_to_list(Loss) end, MyRecord),
 ELO = lists:map(fun([_, _, Elo]) -> integer_to_list(Elo) end, MyRecord),
 
 
@@ -41,51 +45,49 @@ Body = [
         #grid_12 {
 			body=[
 				#panel{
-					class=title,
-					body=[
-						#h1 {text = "Profile"}
-					]
-				},
-				#panel{
-					class=profileWrapper,
+					class=profileInfoWrapper,
 					body=[
 						#panel{body=[
+								#h1 {text = "Profile"},
 								#label{text="email: " ++ Usr},
-								#label{text="win-loss: " ++  WinLoss},
-								#label{text="rating: " ++ ELO}
+								#label{text="win-loss: " ++  WinLossString},
+								#label{text="rating: " ++ ELO},
+								#link{text = "Want to change password?", url = "/changepassword"}
 						]}
 					]
 				},
-				#link{text = "Want to change password?", url = "/changepassword"},
-				#br{},
 
-				#h4 { text="ELO History Chart" },
-				#google_chart {
-					type=line,
-			        title="Line Chart", width=400, height=400, grid_x=25, grid_y=33,
-			        data=[
-			            #chart_data { legend="Data 1", color="2768A9", line_width=5, 
-			                values= lists:map(fun([Elo,_]) -> lists:append([], Elo) end, LastElos)
-			       		}
+				#panel {class=linechartWrapper, body= [
+					#h4 { style="margin:0px;", text="ELO History" },
+					#google_chart {
+						type=line,
+				        width=300, height=150, grid_x=25, grid_y=25,
+				        axes=[
+				        	#chart_axis {position=left, labels = [MinEloValues - 100, (MinEloValues + MaxEloValues) / 2, MaxEloValues + 100]}
+				        ],
+				        data=[
+				            #chart_data { color="2768A9", line_width=5,
+				                min_value = MinEloValues - 100,
+				                max_value = MaxEloValues + 100,
+				                values = EloValues
+				       		}
 			        ]
-			    },
+			    }]},
 
-				#h4 {text = "Win/Loss Rate"},
-				#google_chart {
-					type=pie3d,
-			        title="Pie Chart", width=400, height=400,
-			        axes=[
-            			#chart_axis { position=bottom, labels=["Win", "Loss"] }
-        			],
-			        data=[
-			            #chart_data { legend="Data 1", color="2768A9", line_width=5, 
-			                values= lists:map(fun([Win, Loss,_]) ->
-			                	[Win,Loss]
-			                	
-			                	end, MyRecord)
-			       		}
-			        ]
-			    }
+			    #panel {class=piechartWrapper, body =[
+					#h4 {style="margin:0px;", text = "Win/Loss Rate"},
+					#google_chart {
+						type=pie3d,
+				        width=300, height=150,
+				        axes=[
+	            			#chart_axis { position=bottom, labels=["Win", "Loss"] }
+	        			],
+				        data=[
+				            #chart_data {
+				                values= WinLoss
+				       		}
+				        ]
+				    }]}
 			]
 		}
 
