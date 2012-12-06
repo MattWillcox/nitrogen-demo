@@ -6,9 +6,10 @@
 main() -> #template { file="./site/templates/beta.html" }.
 
 title() -> "href Tetris".
-usr:updateVisit(wf:user()),
+
 
 body() ->
+usr:updateVisit(wf:user()),
     Body = [
     	#container_12 {
     		body = [
