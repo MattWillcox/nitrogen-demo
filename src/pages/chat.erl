@@ -18,13 +18,15 @@ title() -> "Chat Room".
 headline() -> "Chat Room - Comet".
 
 body() -> 
+
+usr:updateVisit(wf:user()),
 	#container_12 { body=[
         #grid_12 { style = "border: 10px solid grey; text-align: center;", body = [ 
                 #singlerow {style="width: 920px;", cells=[
             #tablecell { align=center, body=#link { text="Home", url = "/beta" }},
             #tablecell { align=center, body=#link { text="Leaderboard", url = "/beta" }},
             #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
-            #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Friends", url = "/friends" }},
             #tablecell { align=center, body=#link { text="Chat", url = "/chat" }},
             #tablecell { align=center, body=#link { text="Logout", postback = logout }}
         ]}]},

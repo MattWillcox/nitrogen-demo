@@ -14,6 +14,7 @@ main_authorized() -> #template{file="site/templates/beta.html"}.
 title() -> "href Tetris".
 
 body() -> 
+usr:updateVisit(wf:user()),
 Top10 = elo:top10(),
 Body = [
 	#container_12 { body = [

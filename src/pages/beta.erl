@@ -11,10 +11,16 @@ title() -> "Hello from beta.erl!".
 
 body() -> 
 
+
 Usr = case wf:user() of
     undefined -> "Guest";
     Other -> Other
     end,
+
+case Usr of
+    "Guest" -> ok;
+    _ -> usr:updateVisit(Usr)
+end,
 
 Body = [
 
@@ -93,7 +99,6 @@ Body = [
 
     Body.
 
-
 event(login) ->
         Email = wf:q(idTextbox),
         Password = wf:q(pwTextbox),
@@ -108,6 +113,6 @@ event(login) ->
 event(logout) ->
     wf:user("Guest"),
     wf:clear_session(),
-    wf:redirect("/beta");
+    wf:redirect("/beta").
 
-event(_) -> ok.
+    

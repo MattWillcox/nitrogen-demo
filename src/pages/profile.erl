@@ -16,7 +16,7 @@ title() -> "href Tetris".
 
 
 body() -> 
-
+usr:updateVisit(wf:user()),
 Body = [
 	#container_12 { body = [
         #grid_12 { style = "border: 10px solid grey; text-align: center;", body = [ 
@@ -24,7 +24,7 @@ Body = [
             #tablecell { align=center, body=#link { text="Home", url = "/beta" }},
             #tablecell { align=center, body=#link { text="Leaderboard", url = "/leaderboard" }},
             #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
-            #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
+            #tablecell { align=center, body=#link { text="Friends", url = "/friends" }},
             #tablecell { align=center, body=#link { text="Chat", url = "/chat" }},
             #tablecell { align=center, body=#link { text="Logout", postback = logout}}
         ]}]},

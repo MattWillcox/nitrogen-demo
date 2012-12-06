@@ -8,6 +8,9 @@ main() -> #template { file="./site/templates/beta.html" }.
 title() -> "href Tetris".
 
 body() ->
+
+usr:updateVisit(wf:user()),
+
     wf:wire(pwChangeButton, idTextbox, #validate {validators=[
         #is_required { text="Required." },
         #is_email { text="Invalid Email Address" }
@@ -28,7 +31,7 @@ body() ->
 	            #tablecell { align=center, body=#link { text="Home", url = "/beta" }},
 	            #tablecell { align=center, body=#link { text="Leaderboard", url = "/leaderboard" }},
 	            #tablecell { align=center, body=#link { text="Profile", url = "/profile"}},
-	            #tablecell { align=center, body=#link { text="Friends", url = "/beta" }},
+	            #tablecell { align=center, body=#link { text="Friends", url = "/friends" }},
 	            #tablecell { align=center, body=#link { text="Chat", url = "/chat" }},
 	            #tablecell { align=center, body=#link { text="Logout", postback = logout}}
 	        ]}]},
